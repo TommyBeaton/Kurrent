@@ -1,11 +1,14 @@
+using Lighthouse.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddHealthChecks();
+
+builder.Services.RegisterApp(builder.Configuration);
 
 var app = builder.Build();
 
@@ -16,10 +19,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.MapHealthChecks("/health");
+
+app.UseStaticFiles();
+
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+app.UseRouting();
 
-app.MapControllers();
+app.AddDynamicWebHooks();
+
+app.MapGet("/status", () => StatusCodes.Status200OK);
 
 app.Run();
+
+public partial class Program { }

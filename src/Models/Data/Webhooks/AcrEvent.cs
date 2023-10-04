@@ -5,19 +5,19 @@ namespace Lighthouse.Models.Data.Webhooks;
 public class AcrEvent
 {
     [JsonPropertyName("id")]
-    string Id { get; set; }
+    public string Id { get; set; }
     
     [JsonPropertyName("timestamp")]
-    DateTime Timestamp { get; set; }
+    public DateTime Timestamp { get; set; }
     
     [JsonPropertyName("action")]
-    string Action { get; set; }
+    public string Action { get; set; }
     
     [JsonPropertyName("target")]
-    AcrTarget Target { get; set; }
+    public AcrTarget? Target { get; set; }
     
     [JsonPropertyName("request")]
-    AcrRequest Request { get; set; }
+    public AcrRequest? Request { get; set; }
 }
 
 public class AcrTarget

@@ -7,6 +7,12 @@ public class DockerHubEvent
     [JsonPropertyName("callback_url")]
     public string CallbackUrl { get; set; } 
     
+    [JsonPropertyName("push_data")]
+    public DockerHubPushData? PushData { get; set; }
+    
+    [JsonPropertyName("repository")]
+    public DockerHubRepository? Repository { get; set; }
+    
 }
 
 public class DockerHubPushData
@@ -36,7 +42,7 @@ public class DockerHubRepository
     public string Dockerfile { get; set; }
     
     [JsonPropertyName("full_description")]
-    public int FullDescription { get; set; }
+    public string FullDescription { get; set; }
     
     [JsonPropertyName("is_official")]
     public bool IsOfficial { get; set; }
@@ -57,14 +63,14 @@ public class DockerHubRepository
     public string Owner { get; set; }
     
     [JsonPropertyName("repo_name")]
-    public int RepoName { get; set; }
+    public string RepoName { get; set; }
     
     [JsonPropertyName("repo_url")]
-    public int RepoUrl { get; set; }
+    public string RepoUrl { get; set; }
     
     [JsonPropertyName("star_count")]
     public int StarCount { get; set; }
     
     [JsonPropertyName("status")]
-    public int Status { get; set; }
+    public string Status { get; set; }
 }
