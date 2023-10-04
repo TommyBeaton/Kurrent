@@ -1,0 +1,62 @@
+using System.Text.Json.Serialization;
+
+namespace Lighthouse.Models.Data.Webhooks;
+
+public class AcrEvent
+{
+    [JsonPropertyName("id")]
+    string Id { get; set; }
+    
+    [JsonPropertyName("timestamp")]
+    DateTime Timestamp { get; set; }
+    
+    [JsonPropertyName("action")]
+    string Action { get; set; }
+    
+    [JsonPropertyName("target")]
+    AcrTarget Target { get; set; }
+    
+    [JsonPropertyName("request")]
+    AcrRequest Request { get; set; }
+}
+
+public class AcrTarget
+{
+    [JsonPropertyName("digest")]
+    public string Digest { get; set; }
+    
+    [JsonPropertyName("mediaType")]
+    public string MediaType { get; set; }
+    
+    [JsonPropertyName("size")]
+    public int Size { get; set; }
+    
+    [JsonPropertyName("repository")]
+    public string Repository { get; set; }
+    
+    [JsonPropertyName("tag")]
+    public string Tag { get; set; }
+    
+    [JsonPropertyName("length")]
+    public int Length { get; set; }
+    
+    string GetImageName()
+    {
+        return $"{Repository}:{Tag}";
+    }
+}
+
+public class AcrRequest
+{
+    [JsonPropertyName("id")]
+    public string Id { get; set; }
+    
+    [JsonPropertyName("host")]
+    public string Host { get; set; }
+    
+    [JsonPropertyName("method")]
+    public string Method { get; set; }
+    
+    [JsonPropertyName("useragent")]
+    public string UserAgent { get; set; }
+}
