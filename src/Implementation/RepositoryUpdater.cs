@@ -31,9 +31,8 @@ public class RepositoryUpdater : IRepositoryUpdater
             return;
         }
         
-        _logger.LogError("Starting update for repository: {repositoryName}", repositoryName);
-        
-        
+        _logger.LogInformation("Starting update for repository: {repositoryName}", repositoryName);
+
         var cloneOptions = new CloneOptions
         {
             CredentialsProvider = (_url, _user, _cred) => new UsernamePasswordCredentials
@@ -46,8 +45,9 @@ public class RepositoryUpdater : IRepositoryUpdater
         var repoPath = Repository.Clone(repoConfig.Url, localPath, cloneOptions);
         
         using var repo = new Repository(repoPath);
+
         var branch = repo.Branches[branchName];
-        
+
         if (branch == null)
         {
             _logger.LogError("Branch: {branchName} not found. Cancelling update.", branchName);
@@ -55,11 +55,15 @@ public class RepositoryUpdater : IRepositoryUpdater
         }
         
         Commands.Checkout(repo, branch);
-
+        var files = Directory.GetFiles(repo.Info.WorkingDirectory, "*", SearchOption.AllDirectories);
+        
         // Search and update files
-        foreach (var file in Directory.GetFiles(repoPath, "*", SearchOption.AllDirectories))
+        foreach (var file in files)
         {
-            var content = File.ReadAllText(file);
+            if(file.Contains(".git"))
+                continue;
+            
+            var content = await File.ReadAllTextAsync(file);
 
             if (!content.Contains("# lighthouse update;"))
                 continue;
@@ -68,7 +72,7 @@ public class RepositoryUpdater : IRepositoryUpdater
 
             if (content != updatedContent)
             {
-                File.WriteAllText(file, updatedContent);
+                await File.WriteAllTextAsync(file, updatedContent);
                 Commands.Stage(repo, file);
             }
         }
@@ -82,6 +86,15 @@ public class RepositoryUpdater : IRepositoryUpdater
             var signature = new Signature("Lighthouse Service", "lighthouse@example.com", DateTimeOffset.Now);
             repo.Commit($"Lighthouse update: {container.Host}/{container.Repository}:{container.Tag}", signature, signature);
             
+            var pushOptions = new PushOptions
+            {
+                CredentialsProvider = (_url, _user, _cred) => new UsernamePasswordCredentials
+                {
+                    Username = repoConfig.Username,
+                    Password = repoConfig.Password
+                }
+            };
+            repo.Network.Push(repo.Branches[branchName], pushOptions);
         }
     }
     
