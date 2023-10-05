@@ -1,116 +1,119 @@
-using System.Text.RegularExpressions;
 using LibGit2Sharp;
 using Lighthouse.Interfaces;
 using Lighthouse.Models.Data;
 using Lighthouse.Utils;
 using Microsoft.Extensions.Options;
 
-namespace Lighthouse.Extensions;
+namespace Lighthouse.Implementation;
 
 public class RepositoryUpdater : IRepositoryUpdater
 {
     private readonly LighthouseConfig _lighthouseConfig;
+    private readonly IFileUpdater _fileUpdater;
+    private readonly IGitService _gitService;
     private readonly ILogger<RepositoryUpdater> _logger;
 
     public RepositoryUpdater(
         IOptions<LighthouseConfig> lighthouseConfig, 
+        IFileUpdater fileUpdater,
+        IGitService gitService,
         ILogger<RepositoryUpdater> logger)
     {
         _lighthouseConfig = lighthouseConfig.Value;
+        _fileUpdater = fileUpdater;
+        _gitService = gitService;
         _logger = logger;
     }
 
-
     public async Task UpdateAsync(string repositoryName, Container container, string branchName = "main")
     {
-        var repoConfig = _lighthouseConfig.Repositories?.Single(r => r.Name == repositoryName);
-
+        var repoConfig = GetRepositoryConfig(repositoryName);
         if (repoConfig == null)
         {
-            _logger.LogError("Repository: {repositoryName} not found. Cancelling update.", repositoryName);
+            _logger.LogError("Configuration for Repository: {repositoryName} not found. Update cancelled.", repositoryName);
             return;
         }
-        
-        _logger.LogInformation("Starting update for repository: {repositoryName}", repositoryName);
 
-        var cloneOptions = new CloneOptions
+        _logger.LogInformation("Initiating update for repository: {repositoryName}.", repositoryName);
+
+        using var repo = _gitService.CloneAndCheckout(repoConfig, branchName);
+        if (repo == null)
         {
-            CredentialsProvider = (_url, _user, _cred) => new UsernamePasswordCredentials
-            {
-                Username = repoConfig.Username,
-                Password = repoConfig.Password
-            }
-        };
-        var localPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        var repoPath = Repository.Clone(repoConfig.Url, localPath, cloneOptions);
-        
-        using var repo = new Repository(repoPath);
-
-        var branch = repo.Branches[branchName];
-
-        if (branch == null)
-        {
-            _logger.LogError("Branch: {branchName} not found. Cancelling update.", branchName);
+            _logger.LogWarning("Failed to clone repository: {repositoryName}. Update cancelled.", repositoryName);
             return;
         }
+
+        if (!_gitService.CheckoutBranch(repo, branchName))
+        {
+            _logger.LogWarning("Failed to checkout branch: {branch} in repository: {repositoryName}. Update cancelled.", branchName, repositoryName);
+            DeleteRepo(repo);
+            return;
+        }
+
+        await ProcessFilesInRepository(repo, repoConfig, container);
+
+        CommitAndPushChangesIfAny(repo, branchName, repoConfig, container);
+
+        DeleteRepo(repo);
+        _logger.LogInformation("Update completed for repository: {repositoryName} with container: {container}.", repositoryName, container);
+    }
+
+    private RepositoryConfig? GetRepositoryConfig(string repositoryName)
+    {
+        return _lighthouseConfig.Repositories?.SingleOrDefault(r => r.Name == repositoryName);
+    }
+
+    private async Task ProcessFilesInRepository(Repository repo, RepositoryConfig repoConfig, Container container)
+    {
+        // Filter files by extension
+        var validExtensions = new HashSet<string>(repoConfig.FileExtensions, StringComparer.OrdinalIgnoreCase);
         
-        Commands.Checkout(repo, branch);
-        var files = Directory.GetFiles(repo.Info.WorkingDirectory, "*", SearchOption.AllDirectories);
-        
-        // Search and update files
+        var files=
+            Directory.GetFiles(
+                repo.Info.WorkingDirectory, 
+                "*", 
+                SearchOption.AllDirectories
+            )
+            .Where(
+                file => 
+                    !file.Contains(LighthouseStrings.GitDirectory) && 
+                    validExtensions.Contains(Path.GetExtension(file))
+            )
+            .ToList();
+
+        _logger.LogInformation("Processing {fileCount} files in repository: {repositoryPath}.", files.Count, repo.Info.WorkingDirectory);
+
         foreach (var file in files)
         {
-            if(file.Contains(".git"))
-                continue;
-            
             var content = await File.ReadAllTextAsync(file);
-
-            if (!content.Contains("# lighthouse update;"))
+            if (!content.Contains(LighthouseStrings.LighthouseTag))
                 continue;
 
-            var updatedContent = UpdateImageTagInContent(content, container);
-
+            var updatedContent = _fileUpdater.TryUpdate(content, container);
             if (content != updatedContent)
             {
                 await File.WriteAllTextAsync(file, updatedContent);
                 Commands.Stage(repo, file);
             }
         }
-        
-        var status = repo.RetrieveStatus();
-        bool hasChanges = status.IsDirty;
-        
-        // Commit changes if there are any staged changes
-        if (hasChanges)
-        {
-            var signature = new Signature("Lighthouse Service", "lighthouse@example.com", DateTimeOffset.Now);
-            repo.Commit($"Lighthouse update: {container.Host}/{container.Repository}:{container.Tag}", signature, signature);
-            
-            var pushOptions = new PushOptions
-            {
-                CredentialsProvider = (_url, _user, _cred) => new UsernamePasswordCredentials
-                {
-                    Username = repoConfig.Username,
-                    Password = repoConfig.Password
-                }
-            };
-            repo.Network.Push(repo.Branches[branchName], pushOptions);
-        }
     }
-    
-    private string UpdateImageTagInContent(string content, Container container)
+
+    private void CommitAndPushChangesIfAny(Repository repo, string branchName, RepositoryConfig repoConfig, Container container)
     {
-        var regex = new Regex($"({Regex.Escape(container.Host)}/)?{Regex.Escape(container.Repository)}:[^\\s]+ # lighthouse update; regex: (.*);");
-        return regex.Replace(content, match =>
-        {
-            var pattern = match.Groups[2].Value;
+        if (!_gitService.HasChanges(repo)) return;
 
-            if (Regex.IsMatch(container.Tag, pattern))
-            {
-                return $"{container.Host}/{container.Repository}:{container.Tag} # lighthouse update; regex: {pattern};";
-            }
+        _logger.LogInformation("Committing and pushing changes for repository: {repositoryName}.", repoConfig.Name);
+        _gitService.CommitAndPushChanges(
+            repo,
+            branchName,
+            repoConfig,
+            $"Lighthouse update: {container.Host}/{container.Repository}:{container.Tag}"
+        );
+    }
 
-            return match.Value;
-        });
+    private void DeleteRepo(Repository repo)
+    {
+        Directory.Delete(repo.Info.WorkingDirectory, true);
+        _logger.LogDebug("Deleted local copy of repository from: {repositoryPath}.", repo.Info.WorkingDirectory);
     }
 }

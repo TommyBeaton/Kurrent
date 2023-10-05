@@ -3,3 +3,4 @@
 **/src/obj
 **/src/bin
 **/src/*.editorconfig
+src/appsettings.local-testing.json

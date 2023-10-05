@@ -11,8 +11,11 @@ public static class ServiceCollectionExtensions
         serviceCollection.Configure<LighthouseConfig>(
             configuration.GetSection("Lighthouse")
         );
+        
         serviceCollection.AddTransient<ISubscriptionHandler, SubscriptionHandler>();
         serviceCollection.AddTransient<IRequestHandler, RequestHandler>();
         serviceCollection.AddTransient<IRepositoryUpdater, RepositoryUpdater>();
+        serviceCollection.AddTransient<IFileUpdater, FileUpdater>();
+        serviceCollection.AddTransient<IGitService, GitService>();
     }
 }

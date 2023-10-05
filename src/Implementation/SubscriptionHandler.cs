@@ -46,7 +46,7 @@ public class SubscriptionHandler : ISubscriptionHandler
 
         //Running the updates in parallel
         var updateTasks = subscribers.Select(subscriber => 
-            _repositoryUpdater.UpdateAsync(subscriber.RepositoryName, container)
+            _repositoryUpdater.UpdateAsync(subscriber.RepositoryName, container, subscriber.Branch)
         );
             
         await Task.WhenAll(updateTasks);
