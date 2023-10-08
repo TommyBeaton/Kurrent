@@ -39,10 +39,10 @@ public class PollerConfig
     public string Name { get; set; }
     public string Type { get; set; }
     public int IntervalInSeconds { get; set; }
-    public string Url { get; set; }
+    public string? Url { get; set; }
     public string[] Images { get; set; }
-    public string Username { get; set; }
-    public string Password { get; set; }
+    public string? Username { get; set; }
+    public string? Password { get; set; }
 
     public override string ToString()
     {
