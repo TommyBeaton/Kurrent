@@ -34,7 +34,7 @@ public class PollerManager : IPollerManager
         {
             var poller = _pollerFactory.Create(pollerConfig.Type);
             
-            _logger.LogInformation("Starting poller {poller}", pollerConfig.Name);
+            _logger.LogInformation("Starting poller {poller}", pollerConfig.EventName);
             var task = Task.Run(() => poller.Start(pollerConfig));
             _pollerTasks.Add(task);
         }
