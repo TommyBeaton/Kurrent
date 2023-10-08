@@ -1,4 +1,6 @@
+using System.Globalization;
 using Lighthouse.Interfaces;
+using Lighthouse.Models.Data;
 using Lighthouse.Utils;
 using Microsoft.Extensions.Options;
 
@@ -23,9 +25,11 @@ public class SubscriptionHandler : ISubscriptionHandler
         _logger = logger;
     }
     
-    public async void Update(string webhookName, string type, string requestBody)
+    public void UpdateFromWebhook(string webhookName, string type, string requestBody)
     {
-        _logger.LogDebug($"Received webhook {webhookName} of type {type}");
+        _logger.LogDebug("Received webhook {webhookName} of type {type}", 
+            webhookName, 
+            type);
 
         var container = _requestHandler.GetTagFromRequest(requestBody, type);
 
@@ -35,20 +39,36 @@ public class SubscriptionHandler : ISubscriptionHandler
             return;
         }
         
+        UpdateSubscribers(webhookName, container);
+    }
+
+    public void UpdateFromPoller(string pollerName, Container container)
+    {
+        _logger.LogDebug("Received update from poller: {poller} with container: {container}",
+            pollerName, 
+            container);
+        
+        UpdateSubscribers(pollerName, container);
+    }
+
+    private void UpdateSubscribers(string eventName, Container container)
+    {
         var subscribers =
-            _lighthouseConfig.Subscriptions?.Where(x => x.WebhookName == webhookName).ToList();
+            _lighthouseConfig.Subscriptions?.Where(x => x.WebhookName == eventName).ToList();
 
         if (subscribers == null || !subscribers.Any())
         {
-            _logger.LogWarning($"No subscriber found for webhook {webhookName}. Cancelling update.");
+            _logger.LogWarning($"No subscriber found for event {eventName}. Cancelling update.");
             return;
         }
 
-        //Running the updates in parallel
-        var updateTasks = subscribers.Select(subscriber => 
-            _repositoryUpdater.UpdateAsync(subscriber.RepositoryName, container, subscriber.Branch)
-        );
-            
-        await Task.WhenAll(updateTasks);
+        foreach (var subscriber in subscribers)
+        {
+            _repositoryUpdater.UpdateAsync(
+                subscriber.RepositoryName,
+                container,
+                subscriber.Branch
+            );
+        }
     }
 }

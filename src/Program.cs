@@ -8,6 +8,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddHealthChecks();
 
+builder.Services.AddHttpClient();
+
 builder.Services.RegisterApp(builder.Configuration);
 
 var app = builder.Build();

@@ -8,8 +8,6 @@ public class FileUpdater : IFileUpdater
 {
     private readonly ILogger<FileUpdater> _logger;
 
-    private const string DomainPattern = @"(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}";
-    
     public FileUpdater(ILogger<FileUpdater> logger)
     {
         _logger = logger;
@@ -18,9 +16,7 @@ public class FileUpdater : IFileUpdater
     public string TryUpdate(string content, Container container)
     {
         // If the container.Host is provided, make it mandatory in the regex pattern, otherwise make it optional.
-        string hostPattern = !string.IsNullOrEmpty(container.Host) 
-            ? container.Host + "\\/"
-            : $"({DomainPattern}/)?"; // Matches any valid domain
+        string hostPattern = !string.IsNullOrEmpty(container.Host) ? container.Host + "\\/" : "(?<= )"; 
 
         var regex = new Regex($@"{hostPattern}{Regex.Escape(container.Repository)}:[^\s]+ # lighthouse update; regex: (.*);");
 
@@ -35,12 +31,11 @@ public class FileUpdater : IFileUpdater
             if (!Regex.IsMatch(container.Tag, pattern))
             {
                 _logger.LogTrace("No match found for pattern: {pattern} and tag {tag}", pattern, container.Tag);
-            
                 return match.Value;
             }
             
             _logger.LogTrace("Found match with pattern: {pattern} for tag {tag}", pattern, container.Tag);
-            string updated = $"{container.Host}/{container.Repository}:{container.Tag} # lighthouse update; regex: {pattern};";
+            string updated = $"{container} # lighthouse update; regex: {pattern};";
             _logger.LogDebug("Updated image with new value: {value}", updated);
             return updated;
         });
