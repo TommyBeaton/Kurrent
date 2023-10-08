@@ -24,21 +24,21 @@ public class SubscriptionHandler : ISubscriptionHandler
         _logger = logger;
     }
     
-    public void UpdateFromWebhook(string webhookName, string type, string requestBody)
+    public void UpdateFromWebhook(string eventName, string type, string requestBody)
     {
         _logger.LogDebug("Received webhook {webhookName} of type {type}", 
-            webhookName, 
+            eventName, 
             type);
 
         var container = _requestHandler.GetTagFromRequest(requestBody, type);
 
         if (!container.IsValid)
         {
-            _logger.LogInformation($"Container image not found in request body for webhook {webhookName}. Cancelling update");
+            _logger.LogInformation($"Container image not found in request body for webhook {eventName}. Cancelling update");
             return;
         }
         
-        UpdateSubscribers(webhookName, container);
+        UpdateSubscribers(eventName, container);
     }
 
     public void UpdateFromPoller(string pollerName, Container container)
@@ -53,7 +53,7 @@ public class SubscriptionHandler : ISubscriptionHandler
     private void UpdateSubscribers(string eventName, Container container)
     {
         var subscribers =
-            _lighthouseConfig.Subscriptions?.Where(x => x.WebhookName == eventName).ToList();
+            _lighthouseConfig.Subscriptions?.Where(x => x.EventName == eventName).ToList();
 
         if (subscribers == null || !subscribers.Any())
         {

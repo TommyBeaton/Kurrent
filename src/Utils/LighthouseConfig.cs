@@ -11,7 +11,7 @@ public class LighthouseConfig
 
 public class WebhookConfig
 {
-    public string Name { get; set; }
+    public string EventName { get; set; }
     public string Path { get; set; }
     public string Type { get; set; }
 }
@@ -19,7 +19,7 @@ public class WebhookConfig
 public class SubscriptionConfig
 {
     public string Name { get; set; }
-    public string WebhookName { get; set; }
+    public string EventName { get; set; }
     public string RepositoryName { get; set; }
     public string Branch { get; set; }
 }
@@ -36,7 +36,7 @@ public class RepositoryConfig
 
 public class PollerConfig
 {
-    public string Name { get; set; }
+    public string EventName { get; set; }
     public string Type { get; set; }
     public int IntervalInSeconds { get; set; }
     public string? Url { get; set; }
@@ -46,6 +46,6 @@ public class PollerConfig
 
     public override string ToString()
     {
-        return $"{nameof(Name)}: {Name}, {nameof(Type)}: {Type}, {nameof(IntervalInSeconds)}: {IntervalInSeconds}, {nameof(Url)}: {Url}, {nameof(Images)}: {Images}";
+        return $"{nameof(EventName)}: {EventName}, {nameof(Type)}: {Type}, {nameof(IntervalInSeconds)}: {IntervalInSeconds}, {nameof(Url)}: {Url}, {nameof(Images)}: {Images}";
     }
 }

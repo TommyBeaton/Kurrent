@@ -5,14 +5,13 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["src/Lighthouse.csproj", "Lighthouse/"]
-RUN dotnet restore "Lighthouse/Lighthouse.csproj"
+COPY ["./src/Lighthouse.csproj", "src/"]
+RUN dotnet restore "./src/Lighthouse.csproj"
 COPY . .
-WORKDIR "/src/Lighthouse"
-RUN dotnet build "Lighthouse.csproj" -c Release -o /app/build
+RUN dotnet build "./src/Lighthouse.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Lighthouse.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./src/Lighthouse.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
