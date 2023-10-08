@@ -9,13 +9,12 @@ public abstract class BasePoller : IPoller
     private readonly ISubscriptionHandler _subscriptionHandler;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
-
-
+    
     private readonly string _type;
     private Timer? _timer;
 
     protected PollerConfig? Config;
-    protected string LatestTag = string.Empty;
+    private string _latestTag = string.Empty;
 
     protected BasePoller(
         ISubscriptionHandler subscriptionHandler,
@@ -48,7 +47,7 @@ public abstract class BasePoller : IPoller
         _timer?.Dispose();
     }
 
-    protected virtual async void CheckForUpdates(object? state)
+    private async void CheckForUpdates(object? state)
     {
         using var client = _httpClientFactory.CreateClient();
 
@@ -62,10 +61,10 @@ public abstract class BasePoller : IPoller
             string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
             var latestTag = ExtractLatestTag(jsonResponse, image);
 
-            if(string.IsNullOrEmpty(latestTag) || LatestTag == latestTag)
+            if(string.IsNullOrEmpty(latestTag) || _latestTag == latestTag)
                 continue;
 
-            LatestTag = latestTag;
+            _latestTag = latestTag;
             var container = new Container(Config.Url, image, latestTag);
             _subscriptionHandler.UpdateFromPoller(Config.Name, container);
         }
