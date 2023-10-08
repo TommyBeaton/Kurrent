@@ -10,4 +10,6 @@ public record Container(string Host = "", string Repository = "", string Tag = "
     }
 
     public bool IsValid => !string.IsNullOrEmpty(Repository) && !string.IsNullOrEmpty(Tag);
+    
+    public bool HasHost => !string.IsNullOrEmpty(Host);
 }

@@ -1,4 +1,5 @@
 using Lighthouse.Implementation;
+using Lighthouse.Implementation.Pollers;
 using Lighthouse.Interfaces;
 using Lighthouse.Utils;
 
@@ -17,5 +18,20 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddTransient<IRepositoryUpdater, RepositoryUpdater>();
         serviceCollection.AddTransient<IFileUpdater, FileUpdater>();
         serviceCollection.AddTransient<IGitService, GitService>();
+        serviceCollection.AddTransient<AcrPoller>();
+        serviceCollection.AddTransient<DockerHubPoller>();
+
+        serviceCollection.AddSingleton<IPollerFactory>(ctx =>
+        {
+            var factories = new Dictionary<string, Func<IPoller>>()
+            {
+                [LighthouseStrings.Acr] = () => ctx.GetService<AcrPoller>(),
+                [LighthouseStrings.Docker] = () => ctx.GetService<DockerHubPoller>(),
+            };
+            var logger = ctx.GetService<ILogger<PollerFactory>>();
+            return new PollerFactory(factories, logger);
+        });
+        
+        serviceCollection.AddHostedService<PollerManager>();
     }
 }
