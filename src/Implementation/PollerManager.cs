@@ -1,4 +1,3 @@
-using System.Globalization;
 using Lighthouse.Interfaces;
 using Lighthouse.Utils;
 using Microsoft.Extensions.Options;
