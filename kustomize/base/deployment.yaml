@@ -20,10 +20,7 @@ spec:
     spec:
       containers:
         - name: lighthouse
-          image: tommybeaton/lighthouse:latest-k8s
-#          envFrom:
-#            - configMapRef:
-#                name: lighthouse-config
+          image: tommybeaton/lighthouse:latest-k8s # lighthouse update; regex: .*dev*.;
           ports:
             - containerPort: 80
               name: http
