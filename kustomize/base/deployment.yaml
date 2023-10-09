@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lighthouse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lighthouse
+  template:
+    spec:
+      containers:
+        - name: lighthouse
+          image: tommybeaton/lighthouse:latest
+          envFrom:
+            - configMapRef:
+                name: lighthouse-config
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: 80

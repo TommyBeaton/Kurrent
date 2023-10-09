@@ -1,0 +1,76 @@
+#Check out the Password in repositories section. It is a secret that is stored in the cluster and referenced here through Kustomize. Check the kustomization.yaml for more details.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lighthouse-config
+data:
+  appsettings.Lighthouse.json: |
+    {
+      "Lighthouse": {
+        "Pollers": [
+          {
+            "EventName": "AcrPoller",
+            "Type": "acr",
+            "IntervalInSeconds": 60,
+            "Url": "foo.azurecr.io",
+            "Images": ["foo-api"],
+            "Username": "foo",
+            "Password": "redacted"
+          },
+          {
+            "EventName": "DockerPoller",
+            "Type": "docker",
+            "IntervalInSeconds": 60,
+            "Images": ["nginx"]
+          }
+        ],
+        "Webhooks": [
+          {
+            "EventName": "MainACR",
+            "Path": "/acr/some-guid-would-go-here",
+            "Type": "acr"
+          },
+          {
+            "EventName": "MainDockerHub",
+            "Path": "/docker/some-guid-would-go-here",
+            "Type": "docker"
+          }
+        ],
+        "Subscriptions":[
+          {
+            "Name": "Example webhook subscription",
+            "EventName": "MainACR",
+            "RepositoryName": "Lighthouse-Testing",
+            "Branch": "main"
+          },
+          {
+            "Name": "Example poll subscription ",
+            "EventName": "MainDockerHub",
+            "RepositoryName": "Lighthouse-Testing",
+            "Branch": "main"
+          },
+          {
+            "Name": "Example poll subscription ",
+            "EventName": "AcrPoller",
+            "RepositoryName": "Lighthouse-Testing",
+            "Branch": "main"
+          },
+          {
+            "Name": "Example poll subscription ",
+            "EventName": "DockerPoller",
+            "RepositoryName": "Lighthouse-Testing",
+            "Branch": "main"
+          }
+        ],
+        "Repositories": [
+          {
+            "Name": "Lighthouse-Testing",
+            "Url": "https://github.com/example/example",
+            "Username": "not-used",
+            "Password": "$(GithubToken)", 
+            "FileExtensions": [".yaml"]
+          }
+        ]
+      }
+    }
+    
