@@ -20,10 +20,10 @@ spec:
     spec:
       containers:
         - name: lighthouse
-          image: tommybeaton/lighthouse:latest
-          envFrom:
-            - configMapRef:
-                name: lighthouse-config
+          image: tommybeaton/lighthouse:latest-k8s
+#          envFrom:
+#            - configMapRef:
+#                name: lighthouse-config
           ports:
             - containerPort: 80
               name: http
@@ -36,3 +36,11 @@ spec:
             httpGet:
               path: /status
               port: 80
+          volumeMounts:
+            - name: appsettings-volume
+              mountPath: /app/appsettings.k8s.json
+              subPath: appsettings.k8s.json
+      volumes:
+        - name: appsettings-volume
+          configMap:
+            name: lighthouse-config

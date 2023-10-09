@@ -5,7 +5,7 @@ metadata:
   name: lighthouse-config
 data:
   #IMPORTANT: This name is reserved for the lighthouse config file. Do not change it.
-  appsettings.Lighthouse.json: |
+  appsettings.k8s.json: |-
     {
       "Lighthouse": {
         "Pollers": [

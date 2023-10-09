@@ -8,7 +8,7 @@ builder.Services.AddHttpClient();
 
 builder.Configuration.AddEnvironmentVariables();
 
-builder.Services.RegisterApp(builder.Configuration);
+builder.RegisterApp(builder.Configuration);
 
 var app = builder.Build();
 

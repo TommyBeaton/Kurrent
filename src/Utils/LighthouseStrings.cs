@@ -6,4 +6,5 @@ public static class LighthouseStrings
     public const string Docker = "docker";
     public const string GitDirectory = ".git";
     public const string LighthouseTag = "# lighthouse update;";
+    public const string K8s = "k8s";
 }
