@@ -4,3 +4,4 @@
 **/src/bin
 **/src/*.editorconfig
 src/appsettings.localtesting.json
+src/appsettings.Local.json
