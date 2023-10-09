@@ -88,6 +88,8 @@ image: foo.azurecr.io/foo-api:1.0.1-development # lighthouse update; regex: .*de
     ```bash
     kubectl port-forward svc/lighthouse-service 8080:80 
     ```
+### 🚀 Other Deployment Options
+Lighthouse doesnt need to be deployed to Kubernetes. It can be ran from anywhere that is convenient for your use case. Just pull the image from [Docker Hub](https://hub.docker.com/r/tommybeaton/lighthouse) or build your own!
 
 ## 💻 Local Setup
 
@@ -100,6 +102,7 @@ image: foo.azurecr.io/foo-api:1.0.1-development # lighthouse update; regex: .*de
 ```bash
 docker build -t <image-name> -f src/Dockerfile .
 ```
+You can also pull different versions from [Docker Hub](https://hub.docker.com/r/tommybeaton/lighthouse).
 
 ## 📜 License
 
