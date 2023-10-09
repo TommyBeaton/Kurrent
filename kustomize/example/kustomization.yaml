@@ -10,6 +10,9 @@ labels:
       app.kubernetes.io/version: latest
 resources:
   - https://github.com/TommyBeaton/Lighthouse/kustomize/base
+  - config.yaml
+  - secret.yaml
+  - ingress.yaml
 generatorOptions:
   disableNameSuffixHash: true
 vars:
