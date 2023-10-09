@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    app: lighthouse
     app.kubernetes.io/instance: lighthouse
     app.kubernetes.io/name: lighthouse
   name: lighthouse
