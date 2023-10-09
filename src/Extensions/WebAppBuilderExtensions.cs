@@ -10,14 +10,7 @@ public static class WebAppBuilderExtensions
 {
     public static void RegisterApp(this  WebApplicationBuilder builder, IConfiguration configuration)
     {
-        var configurationDict = configuration.AsEnumerable().ToDictionary(c => c.Key, c => c.Value);
-        string jsonConfiguration = JsonSerializer.Serialize(configurationDict);
-        Console.WriteLine(jsonConfiguration);
-        
-        if (builder.Environment.EnvironmentName == LighthouseStrings.K8s)
-        {
-            builder.Configuration.AddJsonFile("appsettings.k8s.json", optional: false, reloadOnChange: false);
-        }
+        builder.Configuration.AddJsonFile("appsettings.k8s.json", optional: true, reloadOnChange: true);
 
         builder.Services.Configure<LighthouseConfig>(
             configuration.GetSection("Lighthouse")

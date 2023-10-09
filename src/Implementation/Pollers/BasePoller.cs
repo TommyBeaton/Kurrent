@@ -14,7 +14,8 @@ public abstract class BasePoller : IPoller
     private Timer? _timer;
 
     protected PollerConfig? Config;
-    private string _latestTag = string.Empty;
+    
+    private readonly Dictionary<string, string> _latestTags = new();
 
     protected BasePoller(
         ISubscriptionHandler subscriptionHandler,
@@ -49,10 +50,16 @@ public abstract class BasePoller : IPoller
 
     private async void CheckForUpdates(object? state)
     {
-        using var client = _httpClientFactory.CreateClient();
-
         foreach (var image in Config.Images)
         {
+            if(!_latestTags.TryGetValue(image, out string latestKnownTag))
+            {
+                latestKnownTag = String.Empty;
+                _latestTags.Add(image, latestKnownTag);
+            }
+           
+            
+            using var client = _httpClientFactory.CreateClient();
             var httpResponse = await MakeHttpRequest(client, image);
 
             if (httpResponse == null)
@@ -61,10 +68,10 @@ public abstract class BasePoller : IPoller
             string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
             var latestTag = ExtractLatestTag(jsonResponse, image);
 
-            if(string.IsNullOrEmpty(latestTag) || _latestTag == latestTag)
+            if(string.IsNullOrEmpty(latestTag) || latestKnownTag == latestTag)
                 continue;
 
-            _latestTag = latestTag;
+            _latestTags[image] = latestTag;
             var container = new Container(Config.Url, image, latestTag);
             _subscriptionHandler.UpdateFromPoller(Config.EventName, container);
         }
