@@ -6,6 +6,7 @@ Currently, Lighthouse can light the way using both polling and webhooks with ACR
 
 ## ⏰ Future Enhancements
 - 💡 **Direct K8s Updates:** A streamlined way to directly update Kubernetes without any middle agents.
+- 💡 **Notifications:** Receive notifications when updates are made to your Kubernetes manifests.
 
 ## 🚀 Deploying Lighthouse on Kubernetes
 
