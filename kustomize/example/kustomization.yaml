@@ -9,7 +9,7 @@ labels:
   - pairs:
       app.kubernetes.io/version: latest
 resources:
-  - https://github.com/TommyBeaton/Lighthouse//kustomize/base
+  - https://github.com/TommyBeaton/Lighthouse/kustomize/base
 generatorOptions:
   disableNameSuffixHash: true
 vars:
