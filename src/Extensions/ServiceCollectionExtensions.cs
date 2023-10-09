@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Lighthouse.Implementation;
 using Lighthouse.Implementation.Pollers;
 using Lighthouse.Interfaces;
@@ -9,6 +10,10 @@ public static class ServiceCollectionExtensions
 {
     public static void RegisterApp(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
+        var configurationDict = configuration.AsEnumerable().ToDictionary(c => c.Key, c => c.Value);
+        string jsonConfiguration = JsonSerializer.Serialize(configurationDict);
+        Console.WriteLine(jsonConfiguration);
+        
         serviceCollection.Configure<LighthouseConfig>(
             configuration.GetSection("Lighthouse")
         );
