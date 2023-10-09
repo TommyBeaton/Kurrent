@@ -4,6 +4,7 @@ kind: ConfigMap
 metadata:
   name: lighthouse-config
 data:
+  #IMPORTANT: This name is reserved for the lighthouse config file. Do not change it.
   appsettings.Lighthouse.json: |
     {
       "Lighthouse": {
