@@ -1,13 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  labels:
+    app.kubernetes.io/instance: lighthouse
+    app.kubernetes.io/name: lighthouse
   name: lighthouse
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      app: lighthouse
+    matchLabels: 
+      app.kubernetes.io/instance: lighthouse
+      app.kubernetes.io/name: lighthouse
   template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: lighthouse
+        app.kubernetes.io/name: lighthouse
     spec:
       containers:
         - name: lighthouse
