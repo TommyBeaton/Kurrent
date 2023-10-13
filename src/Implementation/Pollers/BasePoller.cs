@@ -1,4 +1,3 @@
-using System.Timers;
 using Lighthouse.Interfaces;
 using Lighthouse.Models.Data;
 using Lighthouse.Utils;
@@ -12,7 +11,7 @@ public abstract class BasePoller : IPoller
     private readonly ILogger _logger;
     
     private readonly string _type;
-    private Timer _timer;
+    private System.Timers.Timer _timer;
 
     protected PollerConfig? Config;
     
