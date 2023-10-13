@@ -17,6 +17,8 @@ public static class WebApplicationExtensions
             (lighthouseConfig?.Pollers == null || !lighthouseConfig.Pollers.Any()))
             throw new InvalidOperationException("No pollers or webhooks are not configured");
         
+        if(lighthouseConfig.Webhooks == null) return;
+        
         foreach (var webhook in lighthouseConfig.Webhooks)
         {
             logger.LogInformation("Adding webhook: {WebhookName} of type: {WebhookType} with path: {WebhookPath}", 

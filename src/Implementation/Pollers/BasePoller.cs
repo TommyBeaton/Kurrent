@@ -1,3 +1,4 @@
+using System.Timers;
 using Lighthouse.Interfaces;
 using Lighthouse.Models.Data;
 using Lighthouse.Utils;
@@ -11,7 +12,7 @@ public abstract class BasePoller : IPoller
     private readonly ILogger _logger;
     
     private readonly string _type;
-    private Timer? _timer;
+    private Timer _timer;
 
     protected PollerConfig? Config;
     
@@ -40,7 +41,11 @@ public abstract class BasePoller : IPoller
         }
 
         Config = config;
-        _timer = new Timer(CheckForUpdates, null, 0, Config.IntervalInSeconds * 1000);
+        _timer = new System.Timers.Timer(Config.IntervalInSeconds * 1000);
+        _timer.Elapsed += async (sender, e) => await CheckForUpdates();
+        _timer.AutoReset = true;
+        _timer.Enabled = true;
+        _timer.Start();
     }
 
     public void Stop()
@@ -48,7 +53,7 @@ public abstract class BasePoller : IPoller
         _timer?.Dispose();
     }
 
-    private async void CheckForUpdates(object? state)
+    private async Task CheckForUpdates()
     {
         foreach (var image in Config.Images)
         {
