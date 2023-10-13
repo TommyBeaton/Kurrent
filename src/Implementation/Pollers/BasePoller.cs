@@ -57,7 +57,6 @@ public abstract class BasePoller : IPoller
                 latestKnownTag = String.Empty;
                 _latestTags.Add(image, latestKnownTag);
             }
-           
             
             using var client = _httpClientFactory.CreateClient();
             var httpResponse = await MakeHttpRequest(client, image);
@@ -66,6 +65,8 @@ public abstract class BasePoller : IPoller
                 continue;
 
             string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+            client.Dispose();
+            
             var latestTag = ExtractLatestTag(jsonResponse, image);
 
             if(string.IsNullOrEmpty(latestTag) || latestKnownTag == latestTag)
@@ -74,8 +75,6 @@ public abstract class BasePoller : IPoller
             _latestTags[image] = latestTag;
             var container = new Container(Config.Url, image, latestTag);
             _subscriptionHandler.UpdateFromPoller(Config.EventName, container);
-            
-            client.Dispose();
         }
     }
 
