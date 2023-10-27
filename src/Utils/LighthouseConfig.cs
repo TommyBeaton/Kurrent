@@ -5,8 +5,8 @@ public class LighthouseConfig
     public List<WebhookConfig>? Webhooks { get; set; }
     public List<SubscriptionConfig>? Subscriptions { get; set; }
     public List<RepositoryConfig>? Repositories { get; set; }
-    
     public List<PollerConfig>? Pollers { get; set; }
+    public List<NotifierConfig>? Notifiers { get; set; }
 }
 
 public class WebhookConfig
@@ -29,8 +29,8 @@ public class RepositoryConfig
     public string Name { get; set; }
     public string Url { get; set; }
     public string Username { get; set; }
-    public string Password { get; set; } 
-    
+    public string Password { get; set; }
+
     public List<string> FileExtensions { get; set; } // Example: [".yaml", ".yml", ".txt"]
 }
 
@@ -48,4 +48,12 @@ public class PollerConfig
     {
         return $"{nameof(EventName)}: {EventName}, {nameof(Type)}: {Type}, {nameof(IntervalInSeconds)}: {IntervalInSeconds}, {nameof(Url)}: {Url}, {nameof(Images)}: {Images}";
     }
+}
+
+public class NotifierConfig
+{
+    public string Type { get; set; }
+    public string Url { get; set; }
+    public string Token { get; set; }
+    public string Channel { get; set; }
 }

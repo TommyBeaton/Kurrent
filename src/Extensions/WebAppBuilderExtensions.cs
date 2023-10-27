@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Lighthouse.Implementation;
+using Lighthouse.Implementation.Notifiers;
 using Lighthouse.Implementation.Pollers;
 using Lighthouse.Interfaces;
 using Lighthouse.Utils;
@@ -33,6 +34,17 @@ public static class WebAppBuilderExtensions
             };
             var logger = ctx.GetService<ILogger<PollerFactory>>();
             return new PollerFactory(factories, logger);
+        });
+
+        builder.Services.AddSingleton<INotifierFactory>(ctx =>
+        {
+            var factories = new Dictionary<string, Func<INotifier>>()
+            {
+                [LighthouseStrings.Teams] = () => ctx.GetService<TeamsNotifier>(),
+                [LighthouseStrings.Slack] = () => ctx.GetService<SlackNotifier>(),
+            };
+            var logger = ctx.GetService<ILogger<NotifierFactory>>();
+            return new NotifierFactory(factories, logger);
         });
         
         builder.Services.AddHostedService<PollerManager>();

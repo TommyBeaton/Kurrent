@@ -4,8 +4,8 @@ Lighthouse auto-updates your Kubernetes manifests with the latest image tags fro
 
 ## ⏰ Upcoming Features
 
-- **Direct K8s Updates**: Directly update Kubernetes.
 - **Notifications**: Receive alerts when your manifests are updated.
+- **Configuration Reload**: Lighthouse will stay up to date with your ConfigMap.
 
 ## 🚏 Getting Started with Lighthouse
 
