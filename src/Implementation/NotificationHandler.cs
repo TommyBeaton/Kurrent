@@ -38,7 +38,12 @@ public class NotificationHandler : INotificationHandler
         }
         
         var notifier = _notifierFactory.Create(notifierConfig.Type);
+        if(notifier == null)
+        {
+            _logger.LogError($"Notifier not found for {notifierConfig.Type}");
+            return;
+        }
+        
         await notifier.NotifyAsync(container, repositoryConfig, notifierConfig, commitSha);
-
     }
 }

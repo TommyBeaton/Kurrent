@@ -4,5 +4,5 @@ namespace Lighthouse.Interfaces;
 
 public interface INotifierFactory
 {
-    public INotifier Create(string notifier);
+    public INotifier? Create(string notifier);
 }

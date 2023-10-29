@@ -16,13 +16,13 @@ public class NotifierFactory : INotifierFactory
         _logger = logger;
     }
     
-    public INotifier Create(string type)
+    public INotifier? Create(string type)
     {
         _logger.LogTrace("Creating notifier of type {type}", type);
         
-        if (!_notifiers.TryGetValue(type, out var factory) || factory is null)
+        if (!_notifiers.TryGetValue(type, out var factory) || factory == null)
             _logger.LogError("No notifier of type {type} found", type);
-        
-        return factory();
+
+        return factory?.Invoke();
     }
 }
