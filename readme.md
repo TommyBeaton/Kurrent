@@ -6,6 +6,7 @@ Lighthouse auto-updates your Kubernetes manifests with the latest image tags fro
 
 - **Notifications**: Receive alerts when your manifests are updated.
 - **Configuration Reload**: Lighthouse will stay up to date with your ConfigMap.
+- **Test Endpoints**: Add in test endpoints to test your configuration without having to push to your registry.
 
 ## 🚏 Getting Started with Lighthouse
 

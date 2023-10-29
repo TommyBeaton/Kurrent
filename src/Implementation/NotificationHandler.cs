@@ -30,7 +30,7 @@ public class NotificationHandler : INotificationHandler
             return;
         }
         
-        var notifierConfig = _lighthouseConfig.Notifiers?.FirstOrDefault(x => x.Name == subscriber.EventName);
+        var notifierConfig = _lighthouseConfig.Notifiers?.FirstOrDefault(x => x.EventName == subscriber.EventName);
         if (notifierConfig == null)
         {
             _logger.LogError($"Notifier config not found for {subscriber.EventName}");

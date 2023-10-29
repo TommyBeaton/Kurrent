@@ -57,4 +57,5 @@ public class NotifierConfig
     public string Url { get; set; }
     public string Token { get; set; }
     public string Channel { get; set; }
+    public string EventName { get; set; }
 }
