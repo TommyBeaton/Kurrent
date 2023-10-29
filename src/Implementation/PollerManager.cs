@@ -34,6 +34,9 @@ public class PollerManager : IPollerManager
         {
             var poller = _pollerFactory.Create(pollerConfig.Type);
             
+            if(poller == null)
+                throw new Exception($"Poller not found for {pollerConfig.Type}");
+            
             _logger.LogInformation("Starting poller {poller}", pollerConfig.EventName);
             var task = Task.Run(() => poller.Start(pollerConfig));
             _pollerTasks.Add(task);

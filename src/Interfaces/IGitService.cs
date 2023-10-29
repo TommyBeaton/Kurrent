@@ -13,7 +13,7 @@ public interface IGitService
         Repository repo,
         string branchName);
     
-    public void CommitAndPushChanges(
+    public string CommitAndPushChanges(
         Repository repo, 
         string branchName, 
         RepositoryConfig repositoryConfig, 

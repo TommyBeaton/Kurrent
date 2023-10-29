@@ -65,7 +65,7 @@ public class GitService : IGitService
         return true;
     }
 
-    public void CommitAndPushChanges(
+    public string CommitAndPushChanges(
         Repository repo, 
         string branchName, 
         RepositoryConfig repositoryConfig,
@@ -74,8 +74,7 @@ public class GitService : IGitService
         _logger.LogTrace("Committing changes to repository: {repositoryName}", repositoryConfig.Name);
         
         var signature = new Signature("Lighthouse Service", "service@lighthouse.com", DateTimeOffset.Now);
-        repo.Commit(commitMessage, signature, signature);
-        
+        var commit = repo.Commit(commitMessage, signature, signature);
         var pushOptions = new PushOptions
         {
             CredentialsProvider = GetCredentialsHandler(repositoryConfig)
@@ -83,6 +82,7 @@ public class GitService : IGitService
         
         _logger.LogInformation("Pushing changes to repository: {repository}", repositoryConfig.Name);
         repo.Network.Push(repo.Branches[branchName], pushOptions);
+        return commit.Sha;
     }
 
     public bool HasChanges(Repository repo)

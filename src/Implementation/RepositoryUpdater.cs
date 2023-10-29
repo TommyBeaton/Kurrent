@@ -25,13 +25,13 @@ public class RepositoryUpdater : IRepositoryUpdater
         _logger = logger;
     }
 
-    public async Task UpdateAsync(string repositoryName, Container container, string branchName = "main")
+    public async Task<(bool, string?)> UpdateAsync(string repositoryName, Container container, string branchName = "main")
     {
         var repoConfig = GetRepositoryConfig(repositoryName);
         if (repoConfig == null)
         {
             _logger.LogError("Configuration for Repository: {repositoryName} not found. Update cancelled.", repositoryName);
-            return;
+            return (false, string.Empty);
         }
 
         _logger.LogInformation("Initiating update for repository: {repositoryName}.", repositoryName);
@@ -40,22 +40,22 @@ public class RepositoryUpdater : IRepositoryUpdater
         if (repo == null)
         {
             _logger.LogWarning("Failed to clone repository: {repositoryName}. Update cancelled.", repositoryName);
-            return;
+            return (false, string.Empty);
         }
 
         if (!_gitService.CheckoutBranch(repo, branchName))
         {
             _logger.LogWarning("Failed to checkout branch: {branch} in repository: {repositoryName}. Update cancelled.", branchName, repositoryName);
             DeleteRepo(repo);
-            return;
+            return (false, string.Empty);
         }
 
         await ProcessFilesInRepository(repo, repoConfig, container);
 
-        CommitAndPushChangesIfAny(repo, branchName, repoConfig, container);
+        (bool didUpdateRepo, string? commitSha) = CommitAndPushChangesIfAny(repo, branchName, repoConfig, container);
 
         DeleteRepo(repo);
-        _logger.LogInformation("Update completed for repository: {repositoryName} with container: {container}.", repositoryName, container);
+        return (didUpdateRepo, commitSha);
     }
 
     private RepositoryConfig? GetRepositoryConfig(string repositoryName)
@@ -98,17 +98,18 @@ public class RepositoryUpdater : IRepositoryUpdater
         }
     }
 
-    private void CommitAndPushChangesIfAny(Repository repo, string branchName, RepositoryConfig repoConfig, Container container)
+    private (bool, string?) CommitAndPushChangesIfAny(Repository repo, string branchName, RepositoryConfig repoConfig, Container container)
     {
-        if (!_gitService.HasChanges(repo)) return;
+        if (!_gitService.HasChanges(repo)) return (false, string.Empty);
 
         _logger.LogInformation("Committing and pushing changes for repository: {repositoryName}.", repoConfig.Name);
-        _gitService.CommitAndPushChanges(
+        var commitSha = _gitService.CommitAndPushChanges(
             repo,
             branchName,
             repoConfig,
             $"Lighthouse update: {container.Host}/{container.Repository}:{container.Tag}"
         );
+        return (true, commitSha);
     }
 
     private void DeleteRepo(Repository repo)

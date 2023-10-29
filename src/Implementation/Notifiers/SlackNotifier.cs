@@ -1,0 +1,141 @@
+using System.Net;
+using System.Net.Http.Headers;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Xml;
+using Lighthouse.Models.Data;
+using Lighthouse.Models.Data.Notifiers;
+using Lighthouse.Utils;
+
+namespace Lighthouse.Implementation.Notifiers;
+
+public class SlackNotifier : BaseNotifier
+{
+    private const string Uri = "https://slack.com/api/chat.postMessage";
+
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger<SlackNotifier> _logger;
+
+    public SlackNotifier(
+        IHttpClientFactory httpClientFactory, 
+        ILogger<SlackNotifier> logger)
+    {
+        _httpClientFactory = httpClientFactory;
+        _logger = logger;
+    }
+
+    public override async Task<NotifierResult> NotifyAsync(Container container, RepositoryConfig repositoryConfig, NotifierConfig notifierConfig,
+        string? commitSha)
+    {
+        using var client = _httpClientFactory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", notifierConfig.Token);
+
+        var message = new SlackMessage
+        {
+            Channel = notifierConfig.Channel,
+            Attachments = BuildMessage(container, repositoryConfig, commitSha)
+        };
+
+        HttpResponseMessage response = null;
+        try
+        {
+            response = await client.PostAsJsonAsync(Uri, message);
+            response.EnsureSuccessStatusCode();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while sending slack notification");
+            return new NotifierResult
+            {
+                StatusCode = response?.StatusCode ?? HttpStatusCode.InternalServerError,
+                Error = e.Message,
+                IsSuccess = false
+            };
+        }
+
+        client.Dispose();
+        var stringResponse = await response.Content.ReadAsStringAsync();
+        _logger.LogTrace("Slack response: {response}", stringResponse);
+        
+        var slackResponse = JsonSerializer.Deserialize<SlackResponse>(stringResponse);
+        if (!slackResponse.Ok)
+        {
+            _logger.LogWarning("Failed to send slack notification: {error}", slackResponse.Error);
+            return new NotifierResult
+            {
+                IsSuccess = false,
+                StatusCode = response.StatusCode,
+                Error = slackResponse.Error
+            };
+        }
+        
+        _logger.LogInformation("Slack notification sent for container {container} in repository {repository}", 
+            container.ImageName, 
+            repositoryConfig.Name);
+
+        return new NotifierResult
+        {
+            IsSuccess = true,
+            StatusCode = response.StatusCode
+        };
+    }
+
+    //Could be good to move over to a factory or builder pattern but feels overkill for now
+    //Could be nice to also remove some of the magic strings but not overly concerned about this right now
+    private List<Attachment> BuildMessage(Container container, RepositoryConfig repositoryConfig, string? commitSha)
+    {
+        var blocks = new List<Block>
+        {
+            new Block
+            {
+                Type = "section",
+                Text = new Text
+                {
+                    Type = "mrkdwn",
+                    Content = LighthouseStrings.MessageHeader
+                }
+            },
+            new Block
+            {
+                Type = "divider"
+            },
+            new Block
+            {
+                Type = "section",
+                Text = new Text
+                {
+                    Type = "mrkdwn",
+                    Content = LighthouseStrings.MessageBody(container.ImageName, repositoryConfig.Url, repositoryConfig.Name)
+                }
+            },
+        };
+
+        if(repositoryConfig.Url.Contains("github.com"))
+            blocks.Add(new Block
+            {
+                Type = "section",
+                Text = new Text
+                {
+                    Type = "mrkdwn",
+                    Content = LighthouseStrings.CommitLink(commitSha, repositoryConfig.Url)
+                }
+            });
+        
+        blocks.Add(new Block
+        {
+            Type = "context",
+            Elements = new List<Element>
+            {
+                new Element
+                {
+                    Type = "mrkdwn",
+                    Text = LighthouseStrings.MessageFooter(commitSha)
+                }
+            }
+        });
+
+        var attachment = new Attachment { Color = LighthouseStrings.InformationBlue, Blocks = blocks};
+        
+        return new List<Attachment>{attachment};
+    }
+}

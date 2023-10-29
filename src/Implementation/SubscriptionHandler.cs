@@ -9,6 +9,7 @@ public class SubscriptionHandler : ISubscriptionHandler
 {
     private readonly IRequestHandler _requestHandler;
     private readonly IRepositoryUpdater _repositoryUpdater;
+    private readonly INotificationHandler _notificationHandler;
     private readonly LighthouseConfig _lighthouseConfig;
     private readonly ILogger<SubscriptionHandler> _logger;
 
@@ -16,15 +17,17 @@ public class SubscriptionHandler : ISubscriptionHandler
         IRequestHandler requestHandler,
         IRepositoryUpdater repositoryUpdater,
         IOptions<LighthouseConfig> lighthouseConfig,
+        INotificationHandler notificationHandler,
         ILogger<SubscriptionHandler> logger)
     {
         _requestHandler = requestHandler;
         _repositoryUpdater = repositoryUpdater;
+        _notificationHandler = notificationHandler;
         _lighthouseConfig = lighthouseConfig.Value;
         _logger = logger;
     }
     
-    public void UpdateFromWebhook(string eventName, string type, string requestBody)
+    public async void UpdateFromWebhook(string eventName, string type, string requestBody)
     {
         _logger.LogDebug("Received webhook {webhookName} of type {type}", 
             eventName, 
@@ -38,19 +41,19 @@ public class SubscriptionHandler : ISubscriptionHandler
             return;
         }
         
-        UpdateSubscribers(eventName, container);
+        await UpdateSubscribers(eventName, container);
     }
 
-    public void UpdateFromPoller(string pollerName, Container container)
+    public async void UpdateFromPoller(string pollerName, Container container)
     {
         _logger.LogDebug("Received update from poller: {poller} with container: {container}",
             pollerName, 
             container);
         
-        UpdateSubscribers(pollerName, container);
+        await UpdateSubscribers(pollerName, container);
     }
 
-    private void UpdateSubscribers(string eventName, Container container)
+    private async Task UpdateSubscribers(string eventName, Container container)
     {
         var subscribers =
             _lighthouseConfig.Subscriptions?.Where(x => x.EventName == eventName).ToList();
@@ -63,11 +66,14 @@ public class SubscriptionHandler : ISubscriptionHandler
 
         foreach (var subscriber in subscribers)
         {
-            _repositoryUpdater.UpdateAsync(
+             (bool didUpdate, string? commitSha) = await _repositoryUpdater.UpdateAsync(
                 subscriber.RepositoryName,
                 container,
                 subscriber.Branch
-            );
+             );
+             
+             if(didUpdate)
+                await _notificationHandler.Send(container, subscriber, commitSha);
         }
     }
 }

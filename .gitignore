@@ -5,3 +5,7 @@
 **/src/*.editorconfig
 src/appsettings.localtesting.json
 src/appsettings.Local.json
+test/Lighthouse.IntegrationTest/appsettings.json
+Lighthouse.sln.DotSettings.user
+test/Lighthouse.IntegrationTest/bin/
+test/Lighthouse.IntegrationTest/obj/
