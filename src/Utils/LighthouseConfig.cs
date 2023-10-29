@@ -52,6 +52,7 @@ public class PollerConfig
 
 public class NotifierConfig
 {
+    public string Name { get; set; }
     public string Type { get; set; }
     public string Url { get; set; }
     public string Token { get; set; }

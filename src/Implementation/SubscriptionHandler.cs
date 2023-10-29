@@ -9,6 +9,7 @@ public class SubscriptionHandler : ISubscriptionHandler
 {
     private readonly IRequestHandler _requestHandler;
     private readonly IRepositoryUpdater _repositoryUpdater;
+    private readonly INotificationHandler _notificationHandler;
     private readonly LighthouseConfig _lighthouseConfig;
     private readonly ILogger<SubscriptionHandler> _logger;
 
@@ -16,10 +17,12 @@ public class SubscriptionHandler : ISubscriptionHandler
         IRequestHandler requestHandler,
         IRepositoryUpdater repositoryUpdater,
         IOptions<LighthouseConfig> lighthouseConfig,
+        INotificationHandler notificationHandler,
         ILogger<SubscriptionHandler> logger)
     {
         _requestHandler = requestHandler;
         _repositoryUpdater = repositoryUpdater;
+        _notificationHandler = notificationHandler;
         _lighthouseConfig = lighthouseConfig.Value;
         _logger = logger;
     }
@@ -67,7 +70,10 @@ public class SubscriptionHandler : ISubscriptionHandler
                 subscriber.RepositoryName,
                 container,
                 subscriber.Branch
-            );
+             );
+             
+             if(didUpdate)
+                await _notificationHandler.Send(container, subscriber, commitSha);
         }
     }
 }

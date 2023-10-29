@@ -5,5 +5,5 @@ namespace Lighthouse.Interfaces;
 
 public interface INotificationHandler
 {
-    public Task Send(Container container, RepositoryConfig repositoryConfig);
+    public Task Send(Container container, SubscriptionConfig subscriber, string? commitSha);
 }

@@ -25,6 +25,9 @@ public static class WebAppBuilderExtensions
         builder.Services.AddTransient<AcrPoller>();
         builder.Services.AddTransient<DockerHubPoller>();
 
+        builder.Services.AddTransient<INotificationHandler, NotificationHandler>();
+        builder.Services.AddTransient<SlackNotifier>();
+
         builder.Services.AddSingleton<IPollerFactory>(ctx =>
         {
             var factories = new Dictionary<string, Func<IPoller>>()
@@ -40,7 +43,6 @@ public static class WebAppBuilderExtensions
         {
             var factories = new Dictionary<string, Func<INotifier>>()
             {
-                [LighthouseStrings.Teams] = () => ctx.GetService<TeamsNotifier>(),
                 [LighthouseStrings.Slack] = () => ctx.GetService<SlackNotifier>(),
             };
             var logger = ctx.GetService<ILogger<NotifierFactory>>();

@@ -16,8 +16,13 @@ public class NotifierFactory : INotifierFactory
         _logger = logger;
     }
     
-    public INotifier Create(Notifier notifier)
+    public INotifier Create(string type)
     {
-        throw new NotImplementedException();
+        _logger.LogTrace("Creating notifier of type {type}", type);
+        
+        if (!_notifiers.TryGetValue(type, out var factory) || factory is null)
+            _logger.LogError("No notifier of type {type} found", type);
+        
+        return factory();
     }
 }
