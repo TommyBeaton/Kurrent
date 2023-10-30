@@ -11,7 +11,7 @@ public static class WebAppBuilderExtensions
 {
     public static void RegisterApp(this  WebApplicationBuilder builder, IConfiguration configuration)
     {
-        builder.Configuration.AddJsonFile("appsettings.k8s.json", optional: true, reloadOnChange: true);
+        builder.Configuration.AddJsonFile("config/appsettings.k8s.json", optional: true, reloadOnChange: true);
 
         builder.Services.Configure<LighthouseConfig>(
             configuration.GetSection("Lighthouse")
