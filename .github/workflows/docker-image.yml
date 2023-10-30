@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - add-in-dynamic-config-updates
 
 jobs:
   build-and-push:
