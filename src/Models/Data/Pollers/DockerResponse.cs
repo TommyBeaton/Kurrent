@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Lighthouse.Models.Data.Pollers;
+namespace Kurrent.Models.Data.Pollers;
 
 public class DockerResponse
 {

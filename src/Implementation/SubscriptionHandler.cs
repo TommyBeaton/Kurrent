@@ -1,31 +1,31 @@
-using Lighthouse.Interfaces;
-using Lighthouse.Models.Data;
-using Lighthouse.Utils;
+using Kurrent.Interfaces;
+using Kurrent.Models.Data;
+using Kurrent.Utils;
 using Microsoft.Extensions.Options;
 
-namespace Lighthouse.Implementation;
+namespace Kurrent.Implementation;
 
 public class SubscriptionHandler : ISubscriptionHandler
 {
     private readonly IRequestHandler _requestHandler;
     private readonly IRepositoryUpdater _repositoryUpdater;
     private readonly INotificationHandler _notificationHandler;
-    private LighthouseConfig _lighthouseConfig;
+    private KurrentConfig _kurrentConfig;
     private readonly ILogger<SubscriptionHandler> _logger;
 
     public SubscriptionHandler(
         IRequestHandler requestHandler,
         IRepositoryUpdater repositoryUpdater,
-        IOptionsMonitor<LighthouseConfig> lighthouseConfig,
+        IOptionsMonitor<KurrentConfig> kurrentConfig,
         INotificationHandler notificationHandler,
         ILogger<SubscriptionHandler> logger)
     {
         _requestHandler = requestHandler;
         _repositoryUpdater = repositoryUpdater;
         _notificationHandler = notificationHandler;
-        _lighthouseConfig = lighthouseConfig.CurrentValue;
+        _kurrentConfig = kurrentConfig.CurrentValue;
         _logger = logger;
-        lighthouseConfig.OnChange(config => _lighthouseConfig = config);
+        kurrentConfig.OnChange(config => _kurrentConfig = config);
     }
     
     public async void UpdateFromWebhook(string eventName, string type, string requestBody)
@@ -57,7 +57,7 @@ public class SubscriptionHandler : ISubscriptionHandler
     private async Task UpdateSubscribers(string eventName, Container container)
     {
         var subscribers =
-            _lighthouseConfig.Subscriptions?.Where(x => x.EventName == eventName).ToList();
+            _kurrentConfig.Subscriptions?.Where(x => x.EventName == eventName).ToList();
 
         if (subscribers == null || !subscribers.Any())
         {

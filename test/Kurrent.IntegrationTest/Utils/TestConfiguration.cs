@@ -1,4 +1,4 @@
-namespace Lighthouse.IntegrationTest.Utils;
+namespace Kurrent.IntegrationTest.Utils;
 
 public class TestConfiguration
 {

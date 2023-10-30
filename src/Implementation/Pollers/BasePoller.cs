@@ -1,8 +1,8 @@
-using Lighthouse.Interfaces;
-using Lighthouse.Models.Data;
-using Lighthouse.Utils;
+using Kurrent.Interfaces;
+using Kurrent.Models.Data;
+using Kurrent.Utils;
 
-namespace Lighthouse.Implementation.Pollers;
+namespace Kurrent.Implementation.Pollers;
 
 public abstract class BasePoller : IPoller
 {

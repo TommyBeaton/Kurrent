@@ -1,4 +1,4 @@
-namespace Lighthouse.Models.Data;
+namespace Kurrent.Models.Data;
 
 public record Container(string Host = "", string Repository = "", string Tag = "")
 {

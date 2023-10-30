@@ -1,6 +1,6 @@
-namespace Lighthouse.Utils;
+namespace Kurrent.Utils;
 
-public class LighthouseConfig
+public class KurrentConfig
 {
     public List<WebhookConfig>? Webhooks { get; set; }
     public List<SubscriptionConfig>? Subscriptions { get; set; }

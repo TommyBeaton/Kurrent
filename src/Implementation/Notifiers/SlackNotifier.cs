@@ -1,13 +1,11 @@
 using System.Net;
 using System.Net.Http.Headers;
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Xml;
-using Lighthouse.Models.Data;
-using Lighthouse.Models.Data.Notifiers;
-using Lighthouse.Utils;
+using Kurrent.Models.Data;
+using Kurrent.Models.Data.Notifiers;
+using Kurrent.Utils;
 
-namespace Lighthouse.Implementation.Notifiers;
+namespace Kurrent.Implementation.Notifiers;
 
 public class SlackNotifier : BaseNotifier
 {
@@ -92,7 +90,7 @@ public class SlackNotifier : BaseNotifier
                 Text = new Text
                 {
                     Type = "mrkdwn",
-                    Content = LighthouseStrings.MessageHeader
+                    Content = KurrentStrings.MessageHeader
                 }
             },
             new Block
@@ -105,7 +103,7 @@ public class SlackNotifier : BaseNotifier
                 Text = new Text
                 {
                     Type = "mrkdwn",
-                    Content = LighthouseStrings.MessageBody(container.ImageName, repositoryConfig.Url, repositoryConfig.Name)
+                    Content = KurrentStrings.MessageBody(container.ImageName, repositoryConfig.Url, repositoryConfig.Name)
                 }
             },
         };
@@ -117,7 +115,7 @@ public class SlackNotifier : BaseNotifier
                 Text = new Text
                 {
                     Type = "mrkdwn",
-                    Content = LighthouseStrings.CommitLink(commitSha, repositoryConfig.Url)
+                    Content = KurrentStrings.CommitLink(commitSha, repositoryConfig.Url)
                 }
             });
         
@@ -129,12 +127,12 @@ public class SlackNotifier : BaseNotifier
                 new Element
                 {
                     Type = "mrkdwn",
-                    Text = LighthouseStrings.MessageFooter(commitSha)
+                    Text = KurrentStrings.MessageFooter(commitSha)
                 }
             }
         });
 
-        var attachment = new Attachment { Color = LighthouseStrings.InformationBlue, Blocks = blocks};
+        var attachment = new Attachment { Color = KurrentStrings.InformationBlue, Blocks = blocks};
         
         return new List<Attachment>{attachment};
     }

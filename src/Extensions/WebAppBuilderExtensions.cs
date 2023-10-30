@@ -1,11 +1,10 @@
-using System.Text.Json;
-using Lighthouse.Implementation;
-using Lighthouse.Implementation.Notifiers;
-using Lighthouse.Implementation.Pollers;
-using Lighthouse.Interfaces;
-using Lighthouse.Utils;
+using Kurrent.Implementation;
+using Kurrent.Implementation.Notifiers;
+using Kurrent.Implementation.Pollers;
+using Kurrent.Interfaces;
+using Kurrent.Utils;
 
-namespace Lighthouse.Extensions;
+namespace Kurrent.Extensions;
 
 public static class WebAppBuilderExtensions
 {
@@ -14,8 +13,8 @@ public static class WebAppBuilderExtensions
         var reloadOnChange = Environment.GetEnvironmentVariable("ReloadConfigOnChange")?.ToLower() == "true";
         builder.Configuration.AddJsonFile(ConfigMapFileProvider.FromRelativePath("config"), "appsettings.k8s.json", optional: true, reloadOnChange: reloadOnChange);
 
-        builder.Services.Configure<LighthouseConfig>(
-            configuration.GetSection("Lighthouse")
+        builder.Services.Configure<KurrentConfig>(
+            configuration.GetSection("Kurrent")
         );
         
         builder.Services.AddTransient<ISubscriptionHandler, SubscriptionHandler>();
@@ -33,8 +32,8 @@ public static class WebAppBuilderExtensions
         {
             var factories = new Dictionary<string, Func<IPoller>>()
             {
-                [LighthouseStrings.Acr] = () => ctx.GetService<AcrPoller>(),
-                [LighthouseStrings.Docker] = () => ctx.GetService<DockerHubPoller>(),
+                [KurrentStrings.Acr] = () => ctx.GetService<AcrPoller>(),
+                [KurrentStrings.Docker] = () => ctx.GetService<DockerHubPoller>(),
             };
             var logger = ctx.GetService<ILogger<PollerFactory>>();
             return new PollerFactory(factories, logger);
@@ -44,7 +43,7 @@ public static class WebAppBuilderExtensions
         {
             var factories = new Dictionary<string, Func<INotifier>>()
             {
-                [LighthouseStrings.Slack] = () => ctx.GetService<SlackNotifier>(),
+                [KurrentStrings.Slack] = () => ctx.GetService<SlackNotifier>(),
             };
             var logger = ctx.GetService<ILogger<NotifierFactory>>();
             return new NotifierFactory(factories, logger);

@@ -1,6 +1,6 @@
-using Lighthouse.Interfaces;
+using Kurrent.Interfaces;
 
-namespace Lighthouse.Implementation;
+namespace Kurrent.Implementation;
 
 public class PollerFactory : IPollerFactory
 {

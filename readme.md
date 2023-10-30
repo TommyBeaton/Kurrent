@@ -1,21 +1,21 @@
-# 🌟 Lighthouse 🌟
+# ⚡ Kurrent ⚡
 
-Lighthouse auto-updates your Kubernetes manifests with the latest image tags from your container registry. Developed in .NET, it supports polling and webhooks for ACR and DockerHub.
+Kurrent auto-updates your Kubernetes manifests with the latest image tags from your container registry. Developed in .NET, it supports polling and webhooks for ACR and DockerHub.
 
 ## ⏰ Upcoming Features
 
 - **Test Endpoints**: Add in test endpoints to test your configuration without having to push to your registry.
 
-## 🚏 Getting Started with Lighthouse
+## 🚏 Getting Started with Kurrent
 
-### How Lighthouse Works
-Lighthouse is a Kubernetes service that monitors your container registry for new image tags.
-When a new tag is detected, Lighthouse will update your Kubernetes manifests to use the latest tag.
+### How Kurrent Works
+Kurrent is a Kubernetes service that monitors your container registry for new image tags.
+When a new tag is detected, Kurrent will update your Kubernetes manifests to use the latest tag.
 This ensures that your Kubernetes deployments are always pointing to the latest image tags.
 It currently supports polling and webhooks for ACR and DockerHub. All of this can be setup in a few simple steps.
 
-### Configuring Lighthouse
-To get Lighthouse working you will need to pass it a configuration file. You can find an [example ConfigMap here](https://github.com/TommyBeaton/Lighthouse/blob/main/kustomize/example/config.yaml).
+### Configuring Kurrent
+To get Kurrent working you will need to pass it a configuration file. You can find an [example ConfigMap here](https://github.com/TommyBeaton/Kurrent/blob/main/kustomize/example/config.yaml).
 #### 📝 Config Overview
 
 Here is the `appsettings.k8s.json` configuration explained:
@@ -48,32 +48,32 @@ Here is the `appsettings.k8s.json` configuration explained:
 ### Annotations for Auto-Updates
 
 To auto-update images in your Kubernetes manifests:
-1. Add the Lighthouse comment to images you want to auto-update in your Kubernetes manifest.
-2. When a new image is received by Lighthouse, it will access the subscribed repos and update manifests with the newest tag.
+1. Add the Kurrent comment to images you want to auto-update in your Kubernetes manifest.
+2. When a new image is received by Kurrent, it will access the subscribed repos and update manifests with the newest tag.
 ```yaml
-image: <IMAGE>:<TAG> # lighthouse update; regex: <REGEX>;
+image: <IMAGE>:<TAG> # kurrent update; regex: <REGEX>;
 ```
 
 #### Example
 The below example will auto-update the image `foo-api:1.0.1-development` when a new tag matching the regex is detected.
 
 ```yaml
-image: foo.azurecr.io/foo-api:1.0.1-development # lighthouse update; regex: .*dev*.;
+image: foo.azurecr.io/foo-api:1.0.1-development # kurrent update; regex: .*dev*.;
 ```
 
-### 🚀 Deploying Lighthouse To Kubernetes
+### 🚀 Deploying Kurrent To Kubernetes
 
 1. **Configuration**:
-    - Create a `ConfigMap` with a `appsettings.k8s.json` key and your config as JSON. [Example ConfigMap](https://github.com/TommyBeaton/Lighthouse/blob/main/kustomize/example/config.yaml).
+    - Create a `ConfigMap` with a `appsettings.k8s.json` key and your config as JSON. [Example ConfigMap](https://github.com/TommyBeaton/Kurrent/blob/main/kustomize/example/config.yaml).
 
 2. **Ingress Setup**:
-    - Deploy an ingress if you're using webhooks. [Example Ingress](https://github.com/TommyBeaton/Lighthouse/blob/main/kustomize/example/ingress.yaml).
+    - Deploy an ingress if you're using webhooks. [Example Ingress](https://github.com/TommyBeaton/Kurrent/blob/main/kustomize/example/ingress.yaml).
 
 3. **Kustomization**:
-    - Create a `kustomization.yaml` for Lighthouse. Be sure to reference the base and your ConfigMap  [Example Kustomization](https://github.com/TommyBeaton/Lighthouse/blob/main/kustomize/example/kustomization.yaml).
+    - Create a `kustomization.yaml` for Kurrent. Be sure to reference the base and your ConfigMap  [Example Kustomization](https://github.com/TommyBeaton/Kurrent/blob/main/kustomize/example/kustomization.yaml).
     ```yaml
     resources:
-      - https://github.com/TommyBeaton/Lighthouse/kustomize/base
+      - https://github.com/TommyBeaton/Kurrent/kustomize/base
       - config.yaml
     ```
 
@@ -82,18 +82,18 @@ image: foo.azurecr.io/foo-api:1.0.1-development # lighthouse update; regex: .*de
     kubectl apply -k <path/to/kustomization/file>
     ```
 
-5. **Check Lighthouse**:
-- Access via `http://lighthouse.yourdomain.com/health` or use port-forward:
+5. **Check Kurrent**:
+- Access via `http://kurrent.yourdomain.com/health` or use port-forward:
     ```bash
-    kubectl port-forward svc/lighthouse-service 8080:80 
+    kubectl port-forward svc/kurrent-service 8080:80 
     ```
 ### 🚀 Other Deployment Options
-Lighthouse doesnt need to be deployed to Kubernetes. It can be ran from anywhere that is convenient for your use case. Just pull the image from [Docker Hub](https://hub.docker.com/r/tommybeaton/lighthouse) or build your own!
+Kurrent doesnt need to be deployed to Kubernetes. It can be ran from anywhere that is convenient for your use case. Just pull the image from [Docker Hub](https://hub.docker.com/r/tommybeaton/kurrent) or build your own!
 
 ## 💻 Local Setup
 
 1. Create `appsettings.Local.json` in `src`.
-2. Use `appsettings.example.json` as a reference. [Link.](https://github.com/TommyBeaton/Lighthouse/blob/main/src/appsettings.example.json)
+2. Use `appsettings.example.json` as a reference. [Link.](https://github.com/TommyBeaton/Kurrent/blob/main/src/appsettings.example.json)
 3. Execute `dotnet run --environment Local` in `src`.
 
 ### 🐳 Docker Build
@@ -101,7 +101,7 @@ Lighthouse doesnt need to be deployed to Kubernetes. It can be ran from anywhere
 ```bash
 docker build -t <image-name> -f src/Dockerfile .
 ```
-You can also pull different versions from [Docker Hub](https://hub.docker.com/r/tommybeaton/lighthouse).
+You can also pull different versions from [Docker Hub](https://hub.docker.com/r/tommybeaton/kurrent).
 
 ## 📜 License
 

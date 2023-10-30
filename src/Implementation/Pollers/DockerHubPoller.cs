@@ -1,9 +1,9 @@
 using System.Text.Json;
-using Lighthouse.Interfaces;
-using Lighthouse.Models.Data.Pollers;
-using Lighthouse.Utils;
+using Kurrent.Interfaces;
+using Kurrent.Models.Data.Pollers;
+using Kurrent.Utils;
 
-namespace Lighthouse.Implementation.Pollers;
+namespace Kurrent.Implementation.Pollers;
 
 public class DockerHubPoller : BasePoller
 {
@@ -17,7 +17,7 @@ public class DockerHubPoller : BasePoller
             subscriptionHandler, 
             httpClientFactory, 
             logger, 
-            LighthouseStrings.Docker)
+            KurrentStrings.Docker)
     {
         _logger = logger;
     }

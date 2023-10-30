@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Lighthouse.Models.Data.Notifiers;
+namespace Kurrent.Models.Data.Notifiers;
 
 public class NotifierResult
 {

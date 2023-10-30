@@ -1,6 +1,6 @@
-using Lighthouse.Utils;
+using Kurrent.Utils;
 
-namespace Lighthouse.Interfaces;
+namespace Kurrent.Interfaces;
 
 public interface IPoller
 {

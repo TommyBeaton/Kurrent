@@ -1,7 +1,7 @@
-using Lighthouse.Models.Data;
-using Lighthouse.Utils;
+using Kurrent.Models.Data;
+using Kurrent.Utils;
 
-namespace Lighthouse.Interfaces;
+namespace Kurrent.Interfaces;
 
 public interface INotificationHandler
 {

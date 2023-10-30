@@ -1,10 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lighthouse", "src\Lighthouse.csproj", "{5CE0E692-6902-4515-BED4-3FACA7E63684}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kurrent", "src\Kurrent.csproj", "{5CE0E692-6902-4515-BED4-3FACA7E63684}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2C7CBAD4-8796-465A-9890-55BC5F79D922}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lighthouse.IntegrationTest", "test/Lighthouse.IntegrationTest\Lighthouse.IntegrationTest.csproj", "{BBF4C778-7D08-4AE0-B0BF-D6838EFE974A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kurrent.IntegrationTest", "test\Kurrent.IntegrationTest\Kurrent.IntegrationTest.csproj", "{BBF4C778-7D08-4AE0-B0BF-D6838EFE974A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{C21F9FD2-34A2-498B-B9D6-ECD4B1CF590D}"
 EndProject

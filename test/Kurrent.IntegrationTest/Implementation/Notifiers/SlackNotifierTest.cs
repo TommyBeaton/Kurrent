@@ -1,14 +1,12 @@
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using FluentAssertions.Execution;
-using Lighthouse.Implementation.Notifiers;
-using Lighthouse.IntegrationTest.Utils;
-using Lighthouse.Models.Data;
-using Lighthouse.Utils;
+using Kurrent.Implementation.Notifiers;
+using Kurrent.IntegrationTest.Utils;
+using Kurrent.Models.Data;
+using Kurrent.Utils;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Lighthouse.IntegrationTest.Implementation.Notifiers;
+namespace Kurrent.IntegrationTest.Implementation.Notifiers;
 
 public class SlackNotifierTest
 {
@@ -16,15 +14,15 @@ public class SlackNotifierTest
     
     public SlackNotifierTest()
     {
-        IHttpClientFactory clientFactory = new LighthouseHttpClientFactory();
+        IHttpClientFactory clientFactory = new KurrentHttpClientFactory();
         _slackNotifier = new SlackNotifier(clientFactory, new NullLogger<SlackNotifier>());
     }
     
     [Fact]
     public async Task Should_Send_Message()
     {
-        var lighthouseConfig = TestUtils.GetConfiguration();
-        var slackToken = lighthouseConfig.Notifiers[0].Token;
+        var kurrentConfig = TestUtils.GetConfiguration();
+        var slackToken = kurrentConfig.Notifiers[0].Token;
         var channel = "U03G66AH3NG";
         Container container = new Container(Repository: "integration", Tag: "test");
         RepositoryConfig repositoryConfig = new RepositoryConfig

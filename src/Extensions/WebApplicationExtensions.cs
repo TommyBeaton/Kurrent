@@ -1,25 +1,25 @@
-using Lighthouse.Interfaces;
-using Lighthouse.Utils;
+using Kurrent.Interfaces;
+using Kurrent.Utils;
 using Microsoft.Extensions.Options;
 
-namespace Lighthouse.Extensions;
+namespace Kurrent.Extensions;
 
 public static class WebApplicationExtensions
 {
     public static void AddDynamicWebHooks(this WebApplication app)
     {
-        var lighthouseConfig = app.Services.GetRequiredService<IOptions<LighthouseConfig>>().Value;
+        var kurrentConfig = app.Services.GetRequiredService<IOptions<KurrentConfig>>().Value;
         
         var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
         var logger = loggerFactory.CreateLogger("WebApplicationExtensions");
         
-        if ((lighthouseConfig?.Webhooks == null || !lighthouseConfig.Webhooks.Any()) && 
-            (lighthouseConfig?.Pollers == null || !lighthouseConfig.Pollers.Any()))
+        if ((kurrentConfig?.Webhooks == null || !kurrentConfig.Webhooks.Any()) && 
+            (kurrentConfig?.Pollers == null || !kurrentConfig.Pollers.Any()))
             throw new InvalidOperationException("No pollers or webhooks are not configured");
         
-        if(lighthouseConfig.Webhooks == null) return;
+        if(kurrentConfig.Webhooks == null) return;
         
-        foreach (var webhook in lighthouseConfig.Webhooks)
+        foreach (var webhook in kurrentConfig.Webhooks)
         {
             logger.LogInformation("Adding webhook: {WebhookName} of type: {WebhookType} with path: {WebhookPath}", 
                 webhook.EventName, webhook.Type, webhook.Path);

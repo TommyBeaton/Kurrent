@@ -1,11 +1,11 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using Lighthouse.Interfaces;
-using Lighthouse.Models.Data.Pollers;
-using Lighthouse.Utils;
+using Kurrent.Interfaces;
+using Kurrent.Models.Data.Pollers;
+using Kurrent.Utils;
 
-namespace Lighthouse.Implementation.Pollers;
+namespace Kurrent.Implementation.Pollers;
 
 public class AcrPoller : BasePoller
 {
@@ -14,7 +14,7 @@ public class AcrPoller : BasePoller
     public AcrPoller(
         ISubscriptionHandler subscriptionHandler,
         IHttpClientFactory httpClientFactory,
-        ILogger<AcrPoller> logger) : base(subscriptionHandler, httpClientFactory, logger, LighthouseStrings.Acr)
+        ILogger<AcrPoller> logger) : base(subscriptionHandler, httpClientFactory, logger, KurrentStrings.Acr)
     {
         _logger = logger;
     }

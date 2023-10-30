@@ -1,8 +1,8 @@
 using System.Text.RegularExpressions;
-using Lighthouse.Interfaces;
-using Lighthouse.Models.Data;
+using Kurrent.Interfaces;
+using Kurrent.Models.Data;
 
-namespace Lighthouse.Implementation;
+namespace Kurrent.Implementation;
 
 public class FileUpdater : IFileUpdater
 {
@@ -18,7 +18,7 @@ public class FileUpdater : IFileUpdater
         // If the container.Host is provided, make it mandatory in the regex pattern, otherwise make it optional.
         string hostPattern = !string.IsNullOrEmpty(container.Host) ? container.Host + "\\/" : "(?<= )"; 
 
-        var regex = new Regex($@"{hostPattern}{Regex.Escape(container.Repository)}:[^\s]+ # lighthouse update; regex: (.*);");
+        var regex = new Regex($@"{hostPattern}{Regex.Escape(container.Repository)}:[^\s]+ # kurrent update; regex: (.*);");
 
         string newContent = regex.Replace(content, match =>
         {
@@ -35,7 +35,7 @@ public class FileUpdater : IFileUpdater
             }
             
             _logger.LogTrace("Found match with pattern: {pattern} for tag {tag}", pattern, container.Tag);
-            string updated = $"{container} # lighthouse update; regex: {pattern};";
+            string updated = $"{container} # kurrent update; regex: {pattern};";
             _logger.LogDebug("Updated image with new value: {value}", updated);
             return updated;
         });

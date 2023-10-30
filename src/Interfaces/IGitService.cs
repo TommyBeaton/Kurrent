@@ -1,7 +1,7 @@
+using Kurrent.Utils;
 using LibGit2Sharp;
-using Lighthouse.Utils;
 
-namespace Lighthouse.Interfaces;
+namespace Kurrent.Interfaces;
 
 public interface IGitService
 {

@@ -1,8 +1,8 @@
-using Lighthouse.Models.Data;
-using Lighthouse.Models.Data.Notifiers;
-using Lighthouse.Utils;
+using Kurrent.Models.Data;
+using Kurrent.Models.Data.Notifiers;
+using Kurrent.Utils;
 
-namespace Lighthouse.Interfaces;
+namespace Kurrent.Interfaces;
 
 public interface INotifier
 {

@@ -1,9 +1,9 @@
-using Lighthouse.Interfaces;
-using Lighthouse.Models.Data;
-using Lighthouse.Models.Data.Notifiers;
-using Lighthouse.Utils;
+using Kurrent.Interfaces;
+using Kurrent.Models.Data;
+using Kurrent.Models.Data.Notifiers;
+using Kurrent.Utils;
 
-namespace Lighthouse.Implementation.Notifiers;
+namespace Kurrent.Implementation.Notifiers;
 
 public abstract class BaseNotifier : INotifier
 {
@@ -14,7 +14,7 @@ public abstract class BaseNotifier : INotifier
     protected string GetPlainMessage(Container container, RepositoryConfig repositoryConfig, string? commitSha)
     {
         string text =
-            $"Kurrent update: New image {container.ImageName} was updated in {repositoryConfig.Name} {LighthouseStrings.GetEmoji()}";
+            $"Kurrent update: New image {container.ImageName} was updated in {repositoryConfig.Name} {KurrentStrings.GetEmoji()}";
         
         text += string.IsNullOrEmpty(commitSha) ? 
             "" : $"\n Commit sha: {commitSha}";
