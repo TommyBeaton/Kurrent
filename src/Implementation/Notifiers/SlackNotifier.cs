@@ -1,8 +1,6 @@
 using System.Net;
 using System.Net.Http.Headers;
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Xml;
 using Kurrent.Models.Data;
 using Kurrent.Models.Data.Notifiers;
 using Kurrent.Utils;
