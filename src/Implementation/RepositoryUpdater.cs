@@ -8,21 +8,23 @@ namespace Lighthouse.Implementation;
 
 public class RepositoryUpdater : IRepositoryUpdater
 {
-    private readonly LighthouseConfig _lighthouseConfig;
+    private LighthouseConfig _lighthouseConfig;
     private readonly IFileUpdater _fileUpdater;
     private readonly IGitService _gitService;
     private readonly ILogger<RepositoryUpdater> _logger;
 
     public RepositoryUpdater(
-        IOptions<LighthouseConfig> lighthouseConfig, 
+        IOptionsMonitor<LighthouseConfig> lighthouseConfig, 
         IFileUpdater fileUpdater,
         IGitService gitService,
         ILogger<RepositoryUpdater> logger)
     {
-        _lighthouseConfig = lighthouseConfig.Value;
+        _lighthouseConfig = lighthouseConfig.CurrentValue;
         _fileUpdater = fileUpdater;
         _gitService = gitService;
         _logger = logger;
+
+        lighthouseConfig.OnChange(config => _lighthouseConfig = config);
     }
 
     public async Task<(bool, string?)> UpdateAsync(string repositoryName, Container container, string branchName = "main")

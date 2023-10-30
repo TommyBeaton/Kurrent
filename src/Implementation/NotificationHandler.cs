@@ -8,17 +8,19 @@ namespace Lighthouse.Implementation;
 public class NotificationHandler : INotificationHandler
 {
     private readonly INotifierFactory _notifierFactory;
-    private readonly LighthouseConfig _lighthouseConfig;
+    private LighthouseConfig _lighthouseConfig;
     private readonly ILogger<NotificationHandler> _logger;
 
     public NotificationHandler(
         INotifierFactory notifierFactory, 
-        IOptions<LighthouseConfig> lighthouseConfig,
+        IOptionsMonitor<LighthouseConfig> lighthouseConfig,
         ILogger<NotificationHandler> logger)
     {
         _notifierFactory = notifierFactory;
-        _lighthouseConfig = lighthouseConfig.Value;
+        _lighthouseConfig = lighthouseConfig.CurrentValue;
         _logger = logger;
+        
+        lighthouseConfig.OnChange(config => _lighthouseConfig = config);
     }
     
     public async Task Send(Container container, SubscriptionConfig subscriber, string? commitSha)
