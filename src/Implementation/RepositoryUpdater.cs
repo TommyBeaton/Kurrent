@@ -83,7 +83,7 @@ public class RepositoryUpdater : IRepositoryUpdater
             )
             .ToList();
 
-        _logger.LogInformation("Processing {fileCount} files in repository: {repositoryPath}.", files.Count, repo.Info.WorkingDirectory);
+        _logger.LogInformation("Processing {fileCount} files in repository: {repositoryName}.", files.Count, repoConfig.Name);
 
         foreach (var file in files)
         {

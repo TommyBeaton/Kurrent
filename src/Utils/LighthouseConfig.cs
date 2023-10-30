@@ -7,6 +7,7 @@ public class LighthouseConfig
     public List<RepositoryConfig>? Repositories { get; set; }
     public List<PollerConfig>? Pollers { get; set; }
     public List<NotifierConfig>? Notifiers { get; set; }
+    public App? App { get; set; }
 }
 
 public class WebhookConfig
@@ -58,4 +59,10 @@ public class NotifierConfig
     public string Token { get; set; }
     public string Channel { get; set; }
     public string EventName { get; set; }
+}
+
+public class App
+{
+    public bool EnableTestEndpoints { get; set; }
+    public string TestEndpointPassword { get; set; }
 }

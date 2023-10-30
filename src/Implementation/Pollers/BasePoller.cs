@@ -56,6 +56,7 @@ public abstract class BasePoller : IPoller
     {
         foreach (var image in Config.Images)
         {
+            _logger.LogInformation("Checking for updates for {image}", image);
             if(!_latestTags.TryGetValue(image, out string latestKnownTag))
             {
                 latestKnownTag = String.Empty;
@@ -71,7 +72,7 @@ public abstract class BasePoller : IPoller
             string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
             client.Dispose();
             
-            var latestTag = ExtractLatestTag(jsonResponse, image);
+            var latestTag = ExtractLatestTag(jsonResponse);
 
             if(string.IsNullOrEmpty(latestTag) || latestKnownTag == latestTag)
                 continue;
@@ -83,5 +84,5 @@ public abstract class BasePoller : IPoller
     }
 
     protected abstract Task<HttpResponseMessage?> MakeHttpRequest(HttpClient client, string image);
-    protected abstract string ExtractLatestTag(string httpResponse, string image);
+    protected abstract string ExtractLatestTag(string httpResponse);
 }

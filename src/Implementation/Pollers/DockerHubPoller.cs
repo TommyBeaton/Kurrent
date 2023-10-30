@@ -28,7 +28,7 @@ public class DockerHubPoller : BasePoller
         return await client.GetAsync($"repositories/library/{image}/tags");
     }
 
-    protected override string ExtractLatestTag(string jsonResponse, string image)
+    protected override string ExtractLatestTag(string jsonResponse)
     {
         var response = JsonSerializer.Deserialize<DockerResponse>(jsonResponse);
         if (response == null)
