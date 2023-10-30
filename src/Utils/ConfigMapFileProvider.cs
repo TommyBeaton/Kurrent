@@ -1,12 +1,13 @@
+// Taken from: https://github.com/fbeltrao/ConfigMapFileProvider. What a saviour!
+
+using System.Collections.Concurrent;
+using System.Reflection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Internal;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Primitives;
-using System.Collections.Concurrent;
-using System.Reflection;
 
-namespace Lighthouse.Implementation;
-
+namespace Lighthouse.Utils;
 
 /// <summary>
 /// Simple <see cref="IFileProvider"/> implementation using config maps as source
@@ -15,9 +16,9 @@ namespace Lighthouse.Implementation;
 /// </summary>
 public class ConfigMapFileProvider : IFileProvider
 {
-    ConcurrentDictionary<string, ConfigMapFileProviderChangeToken> watchers;
+    readonly ConcurrentDictionary<string, ConfigMapFileProviderChangeToken> _watchers;
 
-    public static IFileProvider FromRelativePath(string subPath)
+    public static IFileProvider? FromRelativePath(string subPath)
     {
         var executableLocation = Assembly.GetEntryAssembly().Location;
         var executablePath = Path.GetDirectoryName(executableLocation);
@@ -34,11 +35,11 @@ public class ConfigMapFileProvider : IFileProvider
     {
         if (string.IsNullOrWhiteSpace(rootPath))
         {
-            throw new System.ArgumentException("Invalid root path", nameof(rootPath));
+            throw new ArgumentException("Invalid root path", nameof(rootPath));
         }
 
         RootPath = rootPath;
-        watchers = new ConcurrentDictionary<string, ConfigMapFileProviderChangeToken>();
+        _watchers = new ConcurrentDictionary<string, ConfigMapFileProviderChangeToken>();
     }
 
     public string RootPath { get; }
@@ -56,7 +57,7 @@ public class ConfigMapFileProvider : IFileProvider
 
     public IChangeToken Watch(string filter)
     {
-        var watcher = watchers.AddOrUpdate(filter, 
+        var watcher = _watchers.AddOrUpdate(filter, 
             addValueFactory: (f) =>
             {
                 return new ConfigMapFileProviderChangeToken(RootPath, filter);

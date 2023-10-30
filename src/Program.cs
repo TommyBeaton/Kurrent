@@ -26,4 +26,7 @@ app.MapGet("/status", () => StatusCodes.Status200OK);
 
 app.Run();
 
-public partial class Program { }
+namespace Lighthouse
+{
+    public partial class Program { }
+}

@@ -9,3 +9,4 @@ test/Lighthouse.IntegrationTest/appsettings.json
 Lighthouse.sln.DotSettings.user
 test/Lighthouse.IntegrationTest/bin/
 test/Lighthouse.IntegrationTest/obj/
+src/config/appsettings.k8s.json
