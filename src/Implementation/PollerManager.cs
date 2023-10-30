@@ -8,18 +8,19 @@ public class PollerManager : IPollerManager
 {
     private readonly IPollerFactory _pollerFactory;
     private readonly ILogger<PollerManager> _logger;
-    private readonly LighthouseConfig _lighthouseConfig;
+    private LighthouseConfig _lighthouseConfig;
     
     private readonly List<Task> _pollerTasks = new();
 
     public PollerManager(
-        IOptions<LighthouseConfig> lighthouseConfig, 
+        IOptionsMonitor<LighthouseConfig> lighthouseConfig, 
         IPollerFactory pollerFactory, 
         ILogger<PollerManager> logger)
     {
         _pollerFactory = pollerFactory;
         _logger = logger;
-        _lighthouseConfig = lighthouseConfig.Value;
+        _lighthouseConfig = lighthouseConfig.CurrentValue;
+        lighthouseConfig.OnChange(OnConfigChange);
     }
 
     private void Start()
@@ -43,18 +44,27 @@ public class PollerManager : IPollerManager
         }
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("Starting pollers");
         Start();
         return Task.CompletedTask;
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public Task StopAsync(CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("Stopping pollers");
         foreach(var task in _pollerTasks)
         {
             task.Dispose();
         }
         return Task.CompletedTask;
+    }
+
+    private async void OnConfigChange(LighthouseConfig config)
+    {
+        _lighthouseConfig = config;
+        await StopAsync();
+        await StartAsync();
     }
 }

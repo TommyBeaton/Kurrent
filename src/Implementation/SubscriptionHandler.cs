@@ -10,21 +10,22 @@ public class SubscriptionHandler : ISubscriptionHandler
     private readonly IRequestHandler _requestHandler;
     private readonly IRepositoryUpdater _repositoryUpdater;
     private readonly INotificationHandler _notificationHandler;
-    private readonly LighthouseConfig _lighthouseConfig;
+    private LighthouseConfig _lighthouseConfig;
     private readonly ILogger<SubscriptionHandler> _logger;
 
     public SubscriptionHandler(
         IRequestHandler requestHandler,
         IRepositoryUpdater repositoryUpdater,
-        IOptions<LighthouseConfig> lighthouseConfig,
+        IOptionsMonitor<LighthouseConfig> lighthouseConfig,
         INotificationHandler notificationHandler,
         ILogger<SubscriptionHandler> logger)
     {
         _requestHandler = requestHandler;
         _repositoryUpdater = repositoryUpdater;
         _notificationHandler = notificationHandler;
-        _lighthouseConfig = lighthouseConfig.Value;
+        _lighthouseConfig = lighthouseConfig.CurrentValue;
         _logger = logger;
+        lighthouseConfig.OnChange(config => _lighthouseConfig = config);
     }
     
     public async void UpdateFromWebhook(string eventName, string type, string requestBody)

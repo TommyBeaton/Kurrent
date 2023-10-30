@@ -5,8 +5,6 @@ EXPOSE 443
 ARG ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT
 
-ENV ASPNETCORE_ENVIRONMENT Lighthouse
-
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["./src/Lighthouse.csproj", "src/"]
