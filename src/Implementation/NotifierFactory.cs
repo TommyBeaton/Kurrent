@@ -1,7 +1,7 @@
-using Lighthouse.Interfaces;
-using Lighthouse.Utils;
+using Kurrent.Interfaces;
+using Kurrent.Utils;
 
-namespace Lighthouse.Implementation;
+namespace Kurrent.Implementation;
 
 public class NotifierFactory : INotifierFactory
 {

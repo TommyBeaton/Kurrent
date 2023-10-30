@@ -2,25 +2,25 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: lighthouse
-    app.kubernetes.io/instance: lighthouse
-    app.kubernetes.io/name: lighthouse
-  name: lighthouse
+    app: kurrent
+    app.kubernetes.io/instance: kurrent
+    app.kubernetes.io/name: kurrent
+  name: kurrent
 spec:
   replicas: 1
   selector:
     matchLabels: 
-      app.kubernetes.io/instance: lighthouse
-      app.kubernetes.io/name: lighthouse
+      app.kubernetes.io/instance: kurrent
+      app.kubernetes.io/name: kurrent
   template:
     metadata:
       labels:
-        app.kubernetes.io/instance: lighthouse
-        app.kubernetes.io/name: lighthouse
+        app.kubernetes.io/instance: kurrent
+        app.kubernetes.io/name: kurrent
     spec:
       containers:
-        - name: lighthouse
-          image: tommybeaton/lighthouse:latest-k8s # lighthouse update; regex: .*dev*.;
+        - name: kurrent
+          image: tommybeaton/kurrent:latest-k8s # kurrent update; regex: .*dev*.;
           ports:
             - containerPort: 80
               name: http
@@ -40,4 +40,4 @@ spec:
       volumes:
         - name: appsettings-volume
           configMap:
-            name: lighthouse-config
+            name: kurrent-config

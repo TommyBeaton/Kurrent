@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Lighthouse.Models.Data.Webhooks;
+namespace Kurrent.Models.Data.Webhooks;
 
 public class AcrEvent
 {

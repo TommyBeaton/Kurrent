@@ -7,7 +7,7 @@ using Microsoft.Extensions.FileProviders.Internal;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Primitives;
 
-namespace Lighthouse.Utils;
+namespace Kurrent.Utils;
 
 /// <summary>
 /// Simple <see cref="IFileProvider"/> implementation using config maps as source

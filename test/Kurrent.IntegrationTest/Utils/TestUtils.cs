@@ -1,11 +1,11 @@
-using Lighthouse.Utils;
+using Kurrent.Utils;
 using Microsoft.Extensions.Configuration;
 
-namespace Lighthouse.IntegrationTest.Utils;
+namespace Kurrent.IntegrationTest.Utils;
 
 public static class TestUtils
 {
-    public static LighthouseConfig GetConfiguration()
+    public static KurrentConfig GetConfiguration()
     {
         //load configuration from appsettings.json
         IConfiguration configuration = new ConfigurationBuilder()
@@ -14,6 +14,6 @@ public static class TestUtils
             .Build();
         
         //map configuration to TestConfiguration
-        return configuration.GetSection("Lighthouse").Get<LighthouseConfig>();
+        return configuration.GetSection("Kurrent").Get<KurrentConfig>();
     }
 }

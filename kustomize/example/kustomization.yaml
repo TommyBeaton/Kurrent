@@ -5,11 +5,11 @@ buildMetadata:
 labels:
   - includeSelectors: true
     pairs:
-      app.kubernetes.io/name: lighthouse
+      app.kubernetes.io/name: kurrent
   - pairs:
       app.kubernetes.io/version: latest
 resources:
-  - https://github.com/TommyBeaton/Lighthouse/kustomize/base
+  - https://github.com/TommyBeaton/Kurrent/kustomize/base
   - config.yaml
   - secret.yaml
   - ingress.yaml
@@ -19,7 +19,7 @@ vars:
   - name: GithubToken
     objref:
       kind: Secret
-      name: lighthouse-secrets
+      name: kurrent-secrets
       apiVersion: v1
     fieldref:
       fieldpath: data.GITHUB_TOKEN

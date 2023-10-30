@@ -2,12 +2,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: lighthouse-config
+  name: kurrent-config
 data:
-  #IMPORTANT: This name is reserved for the lighthouse config file. Do not change it.
+  #IMPORTANT: This name is reserved for the Kurrent config file. Do not change it.
   appsettings.k8s.json: |-
     {
-      "Lighthouse": {
+      "Kurrent": {
         "Pollers": [
           {
             "EventName": "AcrPoller",
@@ -41,31 +41,31 @@ data:
           {
             "Name": "Example webhook subscription",
             "EventName": "MainACR",
-            "RepositoryName": "Lighthouse-Testing",
+            "RepositoryName": "Kurrent-Testing",
             "Branch": "main"
           },
           {
             "Name": "Example poll subscription ",
             "EventName": "MainDockerHub",
-            "RepositoryName": "Lighthouse-Testing",
+            "RepositoryName": "Kurrent-Testing",
             "Branch": "main"
           },
           {
             "Name": "Example poll subscription ",
             "EventName": "AcrPoller",
-            "RepositoryName": "Lighthouse-Testing",
+            "RepositoryName": "Kurrent-Testing",
             "Branch": "main"
           },
           {
             "Name": "Example poll subscription ",
             "EventName": "DockerPoller",
-            "RepositoryName": "Lighthouse-Testing",
+            "RepositoryName": "Kurrent-Testing",
             "Branch": "main"
           }
         ],
         "Repositories": [
           {
-            "Name": "Lighthouse-Testing",
+            "Name": "Kurrent-Testing",
             "Url": "https://github.com/example/example",
             "Username": "not-used",
             "Password": "$(GithubToken)", 

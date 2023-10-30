@@ -1,10 +1,10 @@
 using System.Text.Json;
-using Lighthouse.Interfaces;
-using Lighthouse.Models.Data;
-using Lighthouse.Models.Data.Webhooks;
-using Lighthouse.Utils;
+using Kurrent.Interfaces;
+using Kurrent.Models.Data;
+using Kurrent.Models.Data.Webhooks;
+using Kurrent.Utils;
 
-namespace Lighthouse.Implementation;
+namespace Kurrent.Implementation;
 
 public class RequestHandler : IRequestHandler
 {
@@ -20,10 +20,10 @@ public class RequestHandler : IRequestHandler
         Container container;
         switch (webhookType.ToLower())
         {
-            case LighthouseStrings.Acr:
+            case KurrentStrings.Acr:
                 container = GetTagFromAcrRequest(requestBody);
                 break;
-            case LighthouseStrings.Docker:
+            case KurrentStrings.Docker:
                 container = GetTagFromDockerRequest(requestBody);
                 break;
             default:
@@ -44,7 +44,7 @@ public class RequestHandler : IRequestHandler
         var dockerRequest = JsonSerializer.Deserialize<DockerHubEvent>(requestBody);
         
         if (dockerRequest?.Repository == null || dockerRequest.PushData == null)
-            return LogAndReturnFailure(LighthouseStrings.Docker, requestBody);
+            return LogAndReturnFailure(KurrentStrings.Docker, requestBody);
 
         return new Container(Repository: dockerRequest.Repository.Name, Tag: dockerRequest.PushData.Tag);
     }
@@ -54,7 +54,7 @@ public class RequestHandler : IRequestHandler
         var acrRequest = JsonSerializer.Deserialize<AcrEvent>(requestBody);
 
         if (acrRequest?.Request == null || acrRequest.Target == null)
-            return LogAndReturnFailure(LighthouseStrings.Acr, requestBody);
+            return LogAndReturnFailure(KurrentStrings.Acr, requestBody);
         
         return new Container(acrRequest.Request.Host, acrRequest.Target.Repository, acrRequest.Target.Tag);
     }

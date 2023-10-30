@@ -1,38 +1,38 @@
-using Lighthouse.Interfaces;
-using Lighthouse.Models.Data;
-using Lighthouse.Utils;
+using Kurrent.Interfaces;
+using Kurrent.Models.Data;
+using Kurrent.Utils;
 using Microsoft.Extensions.Options;
 
-namespace Lighthouse.Implementation;
+namespace Kurrent.Implementation;
 
 public class NotificationHandler : INotificationHandler
 {
     private readonly INotifierFactory _notifierFactory;
-    private LighthouseConfig _lighthouseConfig;
+    private KurrentConfig _kurrentConfig;
     private readonly ILogger<NotificationHandler> _logger;
 
     public NotificationHandler(
         INotifierFactory notifierFactory, 
-        IOptionsMonitor<LighthouseConfig> lighthouseConfig,
+        IOptionsMonitor<KurrentConfig> kurrentConfig,
         ILogger<NotificationHandler> logger)
     {
         _notifierFactory = notifierFactory;
-        _lighthouseConfig = lighthouseConfig.CurrentValue;
+        _kurrentConfig = kurrentConfig.CurrentValue;
         _logger = logger;
         
-        lighthouseConfig.OnChange(config => _lighthouseConfig = config);
+        kurrentConfig.OnChange(config => _kurrentConfig = config);
     }
     
     public async Task Send(Container container, SubscriptionConfig subscriber, string? commitSha)
     {
-        var repositoryConfig = _lighthouseConfig.Repositories?.FirstOrDefault(x => x.Name == subscriber.RepositoryName);
+        var repositoryConfig = _kurrentConfig.Repositories?.FirstOrDefault(x => x.Name == subscriber.RepositoryName);
         if (repositoryConfig == null)
         {
             _logger.LogError($"Repository config not found for {subscriber.RepositoryName}");
             return;
         }
         
-        var notifierConfig = _lighthouseConfig.Notifiers?.FirstOrDefault(x => x.EventName == subscriber.EventName);
+        var notifierConfig = _kurrentConfig.Notifiers?.FirstOrDefault(x => x.EventName == subscriber.EventName);
         if (notifierConfig == null)
         {
             _logger.LogError($"Notifier config not found for {subscriber.EventName}");

@@ -1,9 +1,6 @@
-using System;
-using System.Net.Http;
+namespace Kurrent.IntegrationTest.Utils;
 
-namespace Lighthouse.IntegrationTest.Utils;
-
-public class LighthouseHttpClientFactory : IHttpClientFactory, IDisposable
+public class KurrentHttpClientFactory : IHttpClientFactory, IDisposable
 {
     private readonly Lazy<HttpMessageHandler> _handlerLazy = new (() => new HttpClientHandler());
 

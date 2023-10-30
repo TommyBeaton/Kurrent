@@ -1,4 +1,4 @@
-namespace Lighthouse.Interfaces;
+namespace Kurrent.Interfaces;
 
 public interface IPollerManager : IHostedService
 {

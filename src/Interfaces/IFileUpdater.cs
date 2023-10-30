@@ -1,6 +1,6 @@
-using Lighthouse.Models.Data;
+using Kurrent.Models.Data;
 
-namespace Lighthouse.Interfaces;
+namespace Kurrent.Interfaces;
 
 public interface IFileUpdater
 {

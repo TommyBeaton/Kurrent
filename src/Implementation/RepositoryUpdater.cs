@@ -1,30 +1,30 @@
+using Kurrent.Interfaces;
+using Kurrent.Models.Data;
+using Kurrent.Utils;
 using LibGit2Sharp;
-using Lighthouse.Interfaces;
-using Lighthouse.Models.Data;
-using Lighthouse.Utils;
 using Microsoft.Extensions.Options;
 
-namespace Lighthouse.Implementation;
+namespace Kurrent.Implementation;
 
 public class RepositoryUpdater : IRepositoryUpdater
 {
-    private LighthouseConfig _lighthouseConfig;
+    private KurrentConfig _kurrentConfig;
     private readonly IFileUpdater _fileUpdater;
     private readonly IGitService _gitService;
     private readonly ILogger<RepositoryUpdater> _logger;
 
     public RepositoryUpdater(
-        IOptionsMonitor<LighthouseConfig> lighthouseConfig, 
+        IOptionsMonitor<KurrentConfig> kurrentConfig, 
         IFileUpdater fileUpdater,
         IGitService gitService,
         ILogger<RepositoryUpdater> logger)
     {
-        _lighthouseConfig = lighthouseConfig.CurrentValue;
+        _kurrentConfig = kurrentConfig.CurrentValue;
         _fileUpdater = fileUpdater;
         _gitService = gitService;
         _logger = logger;
 
-        lighthouseConfig.OnChange(config => _lighthouseConfig = config);
+        kurrentConfig.OnChange(config => _kurrentConfig = config);
     }
 
     public async Task<(bool, string?)> UpdateAsync(string repositoryName, Container container, string branchName = "main")
@@ -62,7 +62,7 @@ public class RepositoryUpdater : IRepositoryUpdater
 
     private RepositoryConfig? GetRepositoryConfig(string repositoryName)
     {
-        return _lighthouseConfig.Repositories?.SingleOrDefault(r => r.Name == repositoryName);
+        return _kurrentConfig.Repositories?.SingleOrDefault(r => r.Name == repositoryName);
     }
 
     private async Task ProcessFilesInRepository(Repository repo, RepositoryConfig repoConfig, Container container)
@@ -78,7 +78,7 @@ public class RepositoryUpdater : IRepositoryUpdater
             )
             .Where(
                 file => 
-                    !file.Contains(LighthouseStrings.GitDirectory) && 
+                    !file.Contains(KurrentStrings.GitDirectory) && 
                     validExtensions.Contains(Path.GetExtension(file))
             )
             .ToList();
@@ -88,7 +88,7 @@ public class RepositoryUpdater : IRepositoryUpdater
         foreach (var file in files)
         {
             var content = await File.ReadAllTextAsync(file);
-            if (!content.Contains(LighthouseStrings.LighthouseTag))
+            if (!content.Contains(KurrentStrings.KurrentTag))
                 continue;
 
             var updatedContent = _fileUpdater.TryUpdate(content, container);
@@ -109,7 +109,7 @@ public class RepositoryUpdater : IRepositoryUpdater
             repo,
             branchName,
             repoConfig,
-            $"Lighthouse update: {container.Host}/{container.Repository}:{container.Tag}"
+            $"Kurrent update: {container.Host}/{container.Repository}:{container.Tag}"
         );
         return (true, commitSha);
     }

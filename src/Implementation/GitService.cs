@@ -1,9 +1,9 @@
+using Kurrent.Interfaces;
+using Kurrent.Utils;
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
-using Lighthouse.Interfaces;
-using Lighthouse.Utils;
 
-namespace Lighthouse.Implementation;
+namespace Kurrent.Implementation;
 
 public class GitService : IGitService
 {
@@ -73,7 +73,7 @@ public class GitService : IGitService
     {
         _logger.LogTrace("Committing changes to repository: {repositoryName}", repositoryConfig.Name);
         
-        var signature = new Signature("Lighthouse Service", "service@lighthouse.com", DateTimeOffset.Now);
+        var signature = new Signature("Kurrent Service", "service@kurrent.tech", DateTimeOffset.Now);
         var commit = repo.Commit(commitMessage, signature, signature);
         var pushOptions = new PushOptions
         {

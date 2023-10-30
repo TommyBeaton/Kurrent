@@ -1,14 +1,14 @@
-using Lighthouse.Models.Data;
+using Kurrent.Models.Data;
 
-namespace Lighthouse.Utils;
+namespace Kurrent.Utils;
 
-public static class LighthouseStrings
+public static class KurrentStrings
 {
     public const string Acr = "acr";
     public const string Docker = "docker";
     public const string Slack = "slack";
     public const string GitDirectory = ".git";
-    public const string LighthouseTag = "# lighthouse update;";
+    public const string KurrentTag = "# kurrent update;";
     public const string K8s = "k8s";
     public static string[] Emojis = new[] { "🔥", "🌊", "😎", "🐳", "💯", "🔧", "🪄", "🎊", "🎉", "🛥️", "🚀", "🛸", "🛰️", "🌟", "🥵" };
     public static string GetEmoji() => Emojis[new Random().Next(0, Emojis.Length)];

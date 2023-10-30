@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using Microsoft.Extensions.Primitives;
 using Timer = System.Threading.Timer;
 
-namespace Lighthouse.Utils;
+namespace Kurrent.Utils;
 
 public class ConfigMapFileProviderChangeToken: IChangeToken, IDisposable
 {

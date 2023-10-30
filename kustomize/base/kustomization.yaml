@@ -5,7 +5,7 @@ buildMetadata:
 labels:
   - includeSelectors: true
     pairs:
-      app.kubernetes.io/name: lighthouse
+      app.kubernetes.io/name: kurrent
   - pairs:
       app.kubernetes.io/version: latest
 resources:

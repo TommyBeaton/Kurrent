@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Lighthouse.Models.Data.Notifiers;
+namespace Kurrent.Models.Data.Notifiers;
 
 public class SlackMessage
 {

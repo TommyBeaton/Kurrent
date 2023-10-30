@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "Lighthouse": {
+    "Kurrent": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,

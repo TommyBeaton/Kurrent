@@ -5,8 +5,8 @@
 **/src/*.editorconfig
 src/appsettings.localtesting.json
 src/appsettings.Local.json
-test/Lighthouse.IntegrationTest/appsettings.json
-Lighthouse.sln.DotSettings.user
-test/Lighthouse.IntegrationTest/bin/
-test/Lighthouse.IntegrationTest/obj/
+test/Kurrent.IntegrationTest/appsettings.json
+Kurrent.sln.DotSettings.user
+test/Kurrent.IntegrationTest/bin/
+test/Kurrent.IntegrationTest/obj/
 src/config/appsettings.k8s.json

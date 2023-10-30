@@ -1,4 +1,4 @@
-using Lighthouse.Extensions;
+using Kurrent.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +26,7 @@ app.MapGet("/status", () => StatusCodes.Status200OK);
 
 app.Run();
 
-namespace Lighthouse
+namespace Kurrent
 {
     public partial class Program { }
 }

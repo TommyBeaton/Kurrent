@@ -1,37 +1,37 @@
-using Lighthouse.Interfaces;
-using Lighthouse.Utils;
+using Kurrent.Interfaces;
+using Kurrent.Utils;
 using Microsoft.Extensions.Options;
 
-namespace Lighthouse.Implementation;
+namespace Kurrent.Implementation;
 
 public class PollerManager : IPollerManager
 {
     private readonly IPollerFactory _pollerFactory;
     private readonly ILogger<PollerManager> _logger;
-    private LighthouseConfig _lighthouseConfig;
+    private KurrentConfig _kurrentConfig;
     
     private readonly List<Task> _pollerTasks = new();
 
     public PollerManager(
-        IOptionsMonitor<LighthouseConfig> lighthouseConfig, 
+        IOptionsMonitor<KurrentConfig> kurrentConfig, 
         IPollerFactory pollerFactory, 
         ILogger<PollerManager> logger)
     {
         _pollerFactory = pollerFactory;
         _logger = logger;
-        _lighthouseConfig = lighthouseConfig.CurrentValue;
-        lighthouseConfig.OnChange(OnConfigChange);
+        _kurrentConfig = kurrentConfig.CurrentValue;
+        kurrentConfig.OnChange(OnConfigChange);
     }
 
     private void Start()
     {
-        if (_lighthouseConfig?.Pollers == null)
+        if (_kurrentConfig?.Pollers == null)
         {
             _logger.LogWarning("No pollers found. This could be expected behaviour if none are configured.");
             return;
         }
         
-        foreach (var pollerConfig in _lighthouseConfig.Pollers)
+        foreach (var pollerConfig in _kurrentConfig.Pollers)
         {
             var poller = _pollerFactory.Create(pollerConfig.Type);
             
@@ -61,9 +61,9 @@ public class PollerManager : IPollerManager
         return Task.CompletedTask;
     }
 
-    private async void OnConfigChange(LighthouseConfig config)
+    private async void OnConfigChange(KurrentConfig config)
     {
-        _lighthouseConfig = config;
+        _kurrentConfig = config;
         await StopAsync();
         await StartAsync();
     }
