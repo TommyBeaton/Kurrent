@@ -11,7 +11,8 @@ public static class WebAppBuilderExtensions
 {
     public static void RegisterApp(this  WebApplicationBuilder builder, IConfiguration configuration)
     {
-        builder.Configuration.AddJsonFile(ConfigMapFileProvider.FromRelativePath("config"), "appsettings.k8s.json", optional: true, reloadOnChange: true);
+        var reloadOnChange = Environment.GetEnvironmentVariable("Lighthouse:ReloadOnChange")?.ToLower() == "true";
+        builder.Configuration.AddJsonFile(ConfigMapFileProvider.FromRelativePath("config"), "appsettings.k8s.json", optional: true, reloadOnChange: reloadOnChange);
 
         builder.Services.Configure<LighthouseConfig>(
             configuration.GetSection("Lighthouse")

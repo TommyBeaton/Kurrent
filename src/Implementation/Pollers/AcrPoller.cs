@@ -28,7 +28,7 @@ public class AcrPoller : BasePoller
         return await client.GetAsync($"{image}/_tags");
     }
 
-    protected override string ExtractLatestTag(string jsonResponse, string image)
+    protected override string ExtractLatestTag(string jsonResponse)
     {
         var response = JsonSerializer.Deserialize<AcrResponse>(jsonResponse);
         if (response == null)
