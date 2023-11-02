@@ -17,5 +17,5 @@ jobs:
       - name: Build solution
         run: dotnet build Kurrent.sln
         
-      - name: Build solution
-        run: dotnet test test/Kurrent.UnitTests/Kurrent.UnitTests.csproj
+      - name: Run unit tests
+        run: dotnet test ./test/Kurrent.UnitTest/Kurrent.UnitTest.csproj
