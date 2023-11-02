@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kurrent.IntegrationTest", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{C21F9FD2-34A2-498B-B9D6-ECD4B1CF590D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kurrent.UnitTest", "test\Kurrent.UnitTest\Kurrent.UnitTest.csproj", "{7BEFA813-47F8-4F60-A9F6-DA34878FB40E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,9 +24,14 @@ Global
 		{BBF4C778-7D08-4AE0-B0BF-D6838EFE974A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBF4C778-7D08-4AE0-B0BF-D6838EFE974A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BBF4C778-7D08-4AE0-B0BF-D6838EFE974A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BEFA813-47F8-4F60-A9F6-DA34878FB40E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BEFA813-47F8-4F60-A9F6-DA34878FB40E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BEFA813-47F8-4F60-A9F6-DA34878FB40E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BEFA813-47F8-4F60-A9F6-DA34878FB40E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5CE0E692-6902-4515-BED4-3FACA7E63684} = {2C7CBAD4-8796-465A-9890-55BC5F79D922}
 		{BBF4C778-7D08-4AE0-B0BF-D6838EFE974A} = {C21F9FD2-34A2-498B-B9D6-ECD4B1CF590D}
+		{7BEFA813-47F8-4F60-A9F6-DA34878FB40E} = {C21F9FD2-34A2-498B-B9D6-ECD4B1CF590D}
 	EndGlobalSection
 EndGlobal
