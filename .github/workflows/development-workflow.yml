@@ -1,7 +1,7 @@
 name: Release Development Workflow
 
 on:
-  pull_request:
+  pull_request_target:
     branches:
       - development
     types: [closed]
@@ -15,8 +15,6 @@ jobs:
     with:
       version: ${{ github.run_number }}
       environment: preview
-      docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
-      docker_password: ${{ secrets.DOCKERHUB_PASSWORD }}
   
   call-publish-kustomization:
     uses: ./.github/workflows/release-kustomization.yaml
