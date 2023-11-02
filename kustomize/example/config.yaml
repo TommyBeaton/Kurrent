@@ -71,6 +71,15 @@ data:
             "Password": "$(GithubToken)", 
             "FileExtensions": [".yaml"]
           }
+        ],
+        "Notifiers": [
+          {
+            "EventName": "MainACR",
+            "Name": "SlackNotifier",
+            "Type": "slack",
+            "Token": "$(SlackToken)",
+            "Channel": "deployments"
+          }
         ]
       }
     }
