@@ -1,0 +1,12 @@
+name: Main Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  call-build-and-push:
+    uses: ./.github/workflows/build-and-push-image.yml
+    with:
+      version: ${{ github.run_number }}

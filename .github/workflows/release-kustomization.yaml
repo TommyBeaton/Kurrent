@@ -1,0 +1,39 @@
+name: Release Kustomization
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+jobs:
+  release-kustomization:
+    name: Release Kustomization
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Prepare Kustomize File
+        run: |
+          sed -i "s|image: tommybeaton/kurrent:.*|image: tommybeaton/kurrent:latest-${{ inputs.version }}|" .kustomize/base/deployment.yaml
+
+      - name: Build Manifest
+        run: kustomize build kustomize/base > release-kurrent.yaml
+
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          prerelease: false
+          files: release-kurrent.yaml
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          name: Release ${{ steps.get_version.outputs.VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
