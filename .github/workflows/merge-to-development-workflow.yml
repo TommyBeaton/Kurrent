@@ -23,3 +23,4 @@ jobs:
     uses: ./.github/workflows/release-kustomization.yaml
     with:
       image: preview-k8s-${{ github.run_number }}
+      github_pat: ${{ secrets.GITHUB_TOKEN }}
