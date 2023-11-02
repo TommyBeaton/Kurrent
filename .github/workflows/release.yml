@@ -12,7 +12,7 @@ jobs:
     uses: ./.github/workflows/run-unit-tests.yml
 
   build-and-push-docker-image:
-    name: Run Unit Tests
+    name: Build & Push Docker Image
     runs-on: ubuntu-latest
     env:
       environment: ${{ github.ref == 'refs/heads/main' && 'latest' || 'preview' }}
@@ -36,7 +36,7 @@ jobs:
           file: ./src/Dockerfile
           push: true
           tags: |
-            tommybeaton/kurrent:${{ env.environment }}-${{ github.run_number }}
+            tommybeaton/kurrent:${{ env.environment }}-v0.0.${{ github.run_number }}
 
       - name: 🏗️ Build and 📤 Push K8s Image 🛥️
         uses: docker/build-push-action@v2
@@ -45,11 +45,11 @@ jobs:
           file: ./src/Dockerfile
           push: true
           tags: |
-            tommybeaton/kurrent:${{ env.environment }}-k8s-${{ github.run_number }}
+            tommybeaton/kurrent:${{ env.environment }}-k8s-v0.0.${{ github.run_number }}
           build-args: ASPNETCORE_ENVIRONMENT=k8s
 
   release-kustomization:
-    name: Run Unit Tests
+    name: Release Kustomization
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -75,5 +75,3 @@ jobs:
           files: release-kurrent.yaml
           tag_name: ${{ steps.get_version.outputs.VERSION }}
           name: Release ${{ steps.get_version.outputs.VERSION }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
