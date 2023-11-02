@@ -57,21 +57,17 @@ jobs:
 
       - name: Prepare Kustomize File
         run: |
-          sed -i "s|image: tommybeaton/kurrent:.*|image: tommybeaton/kurrent:latest-k8s-${{ inputs.version }}|" ./kustomize/base/deployment.yaml
+          sed -i "s|image: tommybeaton/kurrent:.*|image: tommybeaton/kurrent:${{ env.environment }}-k8s-v0.0.${{ github.run_number }}|" ./kustomize/base/deployment.yaml
 
       - name: Build Manifest
         run: kustomize build kustomize/base > release-kurrent.yaml
 
-      - name: Get the version
-        id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-
       - name: Create Release
-        id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          draft: false
-          prerelease: false
+          draft: true
+          prerelease: true
           files: release-kurrent.yaml
-          tag_name: ${{ steps.get_version.outputs.VERSION }}
-          name: Release ${{ steps.get_version.outputs.VERSION }}
+          tag_name: ${{ env.environment }}-k8s-v0.0.${{ github.run_number }}
+          name: Release '${{ env.environment }}-k8s-v0.0.${{ github.run_number }}'
+      
