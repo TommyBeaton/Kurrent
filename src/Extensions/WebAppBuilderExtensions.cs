@@ -8,10 +8,17 @@ namespace Kurrent.Extensions;
 
 public static class WebAppBuilderExtensions
 {
-    public static void RegisterApp(this  WebApplicationBuilder builder, IConfiguration configuration)
+    public static void RegisterApp(this WebApplicationBuilder builder, IConfiguration configuration)
     {
-        var reloadOnChange = Environment.GetEnvironmentVariable("ReloadConfigOnChange")?.ToLower() == "true";
-        builder.Configuration.AddJsonFile(ConfigMapFileProvider.FromRelativePath("config"), "appsettings.k8s.json", optional: true, reloadOnChange: reloadOnChange);
+        if (builder.Environment.EnvironmentName.Contains("k8s"))
+        {
+            var reloadOnChange = Environment.GetEnvironmentVariable("ReloadConfigOnChange")?.ToLower() == "true";
+            builder.Configuration.AddJsonFile(ConfigMapFileProvider.FromRelativePath("config"), "appsettings.k8s.json", optional: true, reloadOnChange: reloadOnChange);
+        }
+
+        #if DEBUG
+        builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+        #endif
 
         builder.Services.Configure<KurrentConfig>(
             configuration.GetSection("Kurrent")

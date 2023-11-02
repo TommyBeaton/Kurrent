@@ -10,6 +10,8 @@ public class PollerManager : IPollerManager
     private readonly ILogger<PollerManager> _logger;
     private KurrentConfig _kurrentConfig;
     
+    private CancellationTokenSource _cts;
+    
     private readonly List<Task> _pollerTasks = new();
 
     public PollerManager(
@@ -30,6 +32,8 @@ public class PollerManager : IPollerManager
             _logger.LogWarning("No pollers found. This could be expected behaviour if none are configured.");
             return;
         }
+
+        _cts = new CancellationTokenSource();
         
         foreach (var pollerConfig in _kurrentConfig.Pollers)
         {
@@ -39,7 +43,7 @@ public class PollerManager : IPollerManager
                 throw new Exception($"Poller not found for {pollerConfig.Type}");
             
             _logger.LogInformation("Starting poller {poller}", pollerConfig.EventName);
-            var task = Task.Run(() => poller.Start(pollerConfig));
+            var task = Task.Run(() => poller.Start(pollerConfig, _cts.Token));
             _pollerTasks.Add(task);
         }
     }
@@ -51,14 +55,25 @@ public class PollerManager : IPollerManager
         return Task.CompletedTask;
     }
 
-    public Task StopAsync(CancellationToken cancellationToken = default)
+    public async Task StopAsync(CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Stopping pollers");
-        foreach(var task in _pollerTasks)
+        
+        // Signal all tasks to cancel
+        _cts.Cancel();
+        _cts.Dispose();
+
+        try
         {
-            task.Dispose();
+            // Wait for all tasks to complete
+            await Task.WhenAll(_pollerTasks);
+            _logger.LogInformation("All pollers stopped");
         }
-        return Task.CompletedTask;
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception while stopping pollers");
+        }
+        
     }
 
     private async void OnConfigChange(KurrentConfig config)
