@@ -7,6 +7,9 @@ on:
       image:
         required: true
         type: string
+      github_token:
+        required: true
+        type: string
 
 jobs:
   release-kustomization:
@@ -37,4 +40,4 @@ jobs:
           tag_name: ${{ steps.get_version.outputs.VERSION }}
           name: Release ${{ steps.get_version.outputs.VERSION }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ inputs.github_token }}
