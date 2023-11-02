@@ -1,4 +1,4 @@
-name: Release Development Workflow
+name: PR Development Workflow
 
 on:
   pull_request:
