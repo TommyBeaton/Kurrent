@@ -13,6 +13,7 @@ jobs:
 
   build-and-push-docker-image:
     name: Build & Push Docker Image
+    needs: call-run-unit-tests
     runs-on: ubuntu-latest
     env:
       environment: ${{ github.ref == 'refs/heads/main' && 'latest' || 'preview' }}
@@ -50,7 +51,10 @@ jobs:
 
   release-kustomization:
     name: Release Kustomization
+    needs: build-and-push-docker-image
     runs-on: ubuntu-latest
+    env:
+      environment: ${{ github.ref == 'refs/heads/main' && 'latest' || 'preview' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -65,8 +69,8 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          draft: true
-          prerelease: true
+          draft: false
+          prerelease: false
           files: release-kurrent.yaml
           tag_name: ${{ env.environment }}-k8s-v0.0.${{ github.run_number }}
           name: Release '${{ env.environment }}-k8s-v0.0.${{ github.run_number }}'
