@@ -10,12 +10,14 @@ jobs:
     uses: ./.github/workflows/run-unit-tests.yml
     
   call-build-and-push:
+    needs: call-run-unit-tests
     uses: ./.github/workflows/build-and-push-image.yml
     with:
       version: ${{ github.run_number }}
       environment: preview
 
   call-publish-kustomization:
+    needs: call-build-and-push
     uses: ./.github/workflows/release-kustomization.yaml
     with:
       image: preview-k8s-${{ github.run_number }}
