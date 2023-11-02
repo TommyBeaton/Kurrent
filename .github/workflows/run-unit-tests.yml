@@ -1,0 +1,21 @@
+name: Build and Run Unit Tests
+
+on:
+  workflow_call:
+  
+jobs:
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Restore solution
+        run: dotnet restore Kurrent.sln
+        
+      - name: Build solution
+        run: dotnet build Kurrent.sln
+        
+      - name: Run unit tests
+        run: dotnet test ./test/Kurrent.UnitTest/Kurrent.UnitTest.csproj
