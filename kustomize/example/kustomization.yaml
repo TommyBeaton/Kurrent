@@ -9,7 +9,7 @@ labels:
   - pairs:
       app.kubernetes.io/version: latest
 resources:
-  - https://github.com/TommyBeaton/Kurrent/kustomize/base
+  - https://github.com/tommybeaton/kurrent/releases/latest/download/release-kurrent.yaml
   - config.yaml
   - secret.yaml
   - ingress.yaml

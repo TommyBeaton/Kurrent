@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: kurrent
-          image: tommybeaton/kurrent:latest-k8s # kurrent update; regex: .*dev*.;
+          image: tommybeaton/kurrent:latest-k8s
           ports:
             - containerPort: 80
               name: http
