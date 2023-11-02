@@ -3,7 +3,7 @@ name: Release Kustomization
 on:
   workflow_call:
     inputs:
-      version:
+      image:
         required: true
         type: string
 
@@ -17,7 +17,7 @@ jobs:
 
       - name: Prepare Kustomize File
         run: |
-          sed -i "s|image: tommybeaton/kurrent:.*|image: tommybeaton/kurrent:latest-${{ inputs.version }}|" .kustomize/base/deployment.yaml
+          sed -i "s|image: tommybeaton/kurrent:.*|image: tommybeaton/kurrent:latest-k8s-${{ inputs.version }}|" .kustomize/base/deployment.yaml
 
       - name: Build Manifest
         run: kustomize build kustomize/base > release-kurrent.yaml

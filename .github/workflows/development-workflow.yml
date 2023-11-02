@@ -13,9 +13,10 @@ jobs:
   call-build-and-push:
     uses: ./.github/workflows/build-and-push-image.yml
     with:
-      version: preview-${{ github.run_number }}
+      version: ${{ github.run_number }}
+      environment: preview
   
   call-publish-kustomization:
     uses: ./.github/workflows/release-kustomization.yaml
     with:
-      version: preview-${{ github.run_number }}
+      image: preview-k8s-${{ github.run_number }}

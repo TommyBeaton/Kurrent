@@ -10,3 +10,9 @@ jobs:
     uses: ./.github/workflows/build-and-push-image.yml
     with:
       version: ${{ github.run_number }}
+      environment: latest
+
+  call-publish-kustomization:
+    uses: ./.github/workflows/release-kustomization.yaml
+    with:
+      image: latest-k8s-${{ github.run_number }}

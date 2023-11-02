@@ -6,6 +6,9 @@ on:
       version:
         required: true
         type: string
+      environment:
+        required: true
+        type: string
 
 jobs:
   build-and-push:
@@ -31,8 +34,8 @@ jobs:
           file: ./src/Dockerfile
           push: true
           tags: |
-            tommybeaton/kurrent:latest
-            tommybeaton/kurrent:${{ inputs.version }}
+            tommybeaton/kurrent:${{ inputs.environment }}
+            tommybeaton/kurrent:${{ inputs.environment }}-${{ inputs.version }}
 
       - name: 🏗️ Build and 📤 Push K8s Image 🛥️
         uses: docker/build-push-action@v2
@@ -40,5 +43,5 @@ jobs:
           context: .
           file: ./src/Dockerfile
           push: true
-          tags: tommybeaton/kurrent:latest-k8s
+          tags: tommybeaton/kurrent:${{ inputs.environment }}-k8s
           build-args: ASPNETCORE_ENVIRONMENT=k8s
