@@ -12,7 +12,7 @@ on:
 
 jobs:
   build-and-push:
-    name: Build & Push Docker Image
+    name: Run Unit Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

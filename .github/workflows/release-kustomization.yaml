@@ -6,9 +6,6 @@ on:
       image:
         required: true
         type: string
-      github_pat:
-        required: true
-        type: string
 
 jobs:
   release-kustomization:
