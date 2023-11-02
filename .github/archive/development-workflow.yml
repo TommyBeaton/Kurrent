@@ -1,0 +1,25 @@
+#name: Release Development Workflow
+#
+#on:
+#  pull_request_target:
+#    branches:
+#      - development
+#    types: [closed]
+#
+#jobs:
+#  call-run-unit-tests:
+#    uses: ./.github/workflows/run-unit-tests.yml
+#  
+#  call-build-and-push:
+#    uses: ./.github/workflows/build-and-push-image.yml
+#    with:
+#      version: ${{ github.run_number }}
+#      environment: preview
+#      docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
+#      docker_password: ${{ secrets.DOCKERHUB_PASSWORD }}
+#  
+#  call-publish-kustomization:
+#    uses: ./.github/workflows/release-kustomization.yaml
+#    with:
+#      image: preview-k8s-${{ github.run_number }}
+#      github_token: ${{ secrets.GITHUB_TOKEN }}

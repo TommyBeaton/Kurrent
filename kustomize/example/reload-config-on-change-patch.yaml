@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kurrent
+spec:
+  template:
+    spec:
+      containers:
+        - name: tommybeaton/kurrent:latest-k8s-v0.0.1 # Replace with the actual version of Kurrent
+          env:
+            - name: ReloadConfigOnChange
+              value: "false"

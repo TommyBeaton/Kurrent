@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -9,7 +10,7 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchLabels: 
+    matchLabels:
       app.kubernetes.io/instance: kurrent
       app.kubernetes.io/name: kurrent
   template:
@@ -20,7 +21,7 @@ spec:
     spec:
       containers:
         - name: kurrent
-          image: tommybeaton/kurrent:latest-k8s # kurrent update; regex: .*dev*.;
+          image: tommybeaton/kurrent:latest-k8s
           ports:
             - containerPort: 80
               name: http
@@ -35,8 +36,10 @@ spec:
               port: 80
           volumeMounts:
             - name: appsettings-volume
-              mountPath: /app/appsettings.k8s.json
-              subPath: appsettings.k8s.json
+              mountPath: /app/config
+          env:
+            - name: ReloadConfigOnChange
+              value: "true"
       volumes:
         - name: appsettings-volume
           configMap:

@@ -9,7 +9,7 @@ labels:
   - pairs:
       app.kubernetes.io/version: latest
 resources:
-  - https://github.com/TommyBeaton/Kurrent/kustomize/base
+  - https://github.com/tommybeaton/kurrent/releases/latest/download/release-kurrent.yaml
   - config.yaml
   - secret.yaml
   - ingress.yaml
@@ -23,3 +23,14 @@ vars:
       apiVersion: v1
     fieldref:
       fieldpath: data.GITHUB_TOKEN
+  - name: SlackToken
+    objref:
+      kind: Secret
+      name: kurrent-secrets
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.SLACK_TOKEN
+
+# If you want to use automatic config reloading, comment out/remove the following lines.
+patchesStrategicMerge:
+  - reload-config-on-change-patch.yaml
