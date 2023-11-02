@@ -10,16 +10,16 @@ public static class WebAppBuilderExtensions
 {
     public static void RegisterApp(this WebApplicationBuilder builder, IConfiguration configuration)
     {
-        if (builder.Environment.EnvironmentName != "Local")
+        if (builder.Environment.EnvironmentName.Contains("k8s"))
         {
             var reloadOnChange = Environment.GetEnvironmentVariable("ReloadConfigOnChange")?.ToLower() == "true";
             builder.Configuration.AddJsonFile(ConfigMapFileProvider.FromRelativePath("config"), "appsettings.k8s.json", optional: true, reloadOnChange: reloadOnChange);
         }
-        else
-        {
-            builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
-        }
-        
+
+        #if DEBUG
+        builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+        #endif
+
         builder.Services.Configure<KurrentConfig>(
             configuration.GetSection("Kurrent")
         );
