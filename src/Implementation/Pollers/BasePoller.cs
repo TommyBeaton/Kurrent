@@ -1,3 +1,4 @@
+using System.Timers;
 using Kurrent.Interfaces;
 using Kurrent.Models.Data;
 using Kurrent.Utils;
@@ -16,6 +17,7 @@ public abstract class BasePoller : IPoller
     protected PollerConfig? Config;
     
     private readonly Dictionary<string, string> _latestTags = new();
+    private ElapsedEventHandler _handler;
 
     protected BasePoller(
         ISubscriptionHandler subscriptionHandler,
@@ -29,7 +31,7 @@ public abstract class BasePoller : IPoller
         _type = type;
     }
 
-    public void Start(PollerConfig config)
+    public void Start(PollerConfig config, CancellationToken token)
     {
         if (config.Type != _type)
         {
@@ -39,9 +41,14 @@ public abstract class BasePoller : IPoller
                 config);
         }
 
+        _handler = (sender, e) => 
+        {
+            Task.Run(async () => await CheckForUpdates(token), token).Wait(token);
+        };
+
         Config = config;
         _timer = new System.Timers.Timer(Config.IntervalInSeconds * 1000);
-        _timer.Elapsed += async (sender, e) => await CheckForUpdates();
+        _timer.Elapsed += _handler;
         _timer.AutoReset = true;
         _timer.Enabled = true;
         _timer.Start();
@@ -49,20 +56,25 @@ public abstract class BasePoller : IPoller
 
     public void Stop()
     {
-        _timer?.Dispose();
+        _timer.Stop();
+        _timer.Elapsed -= _handler;
+        _timer.Dispose();
     }
 
-    private async Task CheckForUpdates()
+    private async Task CheckForUpdates(CancellationToken token)
     {
         foreach (var image in Config.Images)
         {
-            _logger.LogInformation("Checking for updates for {image}", image);
+            if(token.IsCancellationRequested) //Check if we should stop
+                Stop();
+            
+            _logger.LogInformation("Checking for {image} updates", image);
             if(!_latestTags.TryGetValue(image, out string latestKnownTag))
             {
                 latestKnownTag = String.Empty;
                 _latestTags.Add(image, latestKnownTag);
             }
-            
+        
             using var client = _httpClientFactory.CreateClient();
             var httpResponse = await MakeHttpRequest(client, image);
 
@@ -71,7 +83,8 @@ public abstract class BasePoller : IPoller
 
             string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
             client.Dispose();
-            
+            httpResponse.Dispose();
+
             var latestTag = ExtractLatestTag(jsonResponse);
 
             if(string.IsNullOrEmpty(latestTag) || latestKnownTag == latestTag)

@@ -10,3 +10,4 @@ Kurrent.sln.DotSettings.user
 test/Kurrent.IntegrationTest/bin/
 test/Kurrent.IntegrationTest/obj/
 src/config/appsettings.k8s.json
+src/appsettings.Local-store.json

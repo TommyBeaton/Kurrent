@@ -57,7 +57,7 @@ public class ConfigMapFileProviderChangeToken: IChangeToken, IDisposable
         }
     }
 
-    public ConfigMapFileProviderChangeToken(string rootPath, string filter, int detectChangeIntervalMs = 30_000)
+    public ConfigMapFileProviderChangeToken(string rootPath, string filter, int detectChangeIntervalMs = 10_000)
     {
         _registeredCallbacks = new List<CallbackRegistration>();
         _rootPath = rootPath;
@@ -87,13 +87,13 @@ public class ConfigMapFileProviderChangeToken: IChangeToken, IDisposable
 
         var newCheckSum = GetFileChecksum(fullPath);
         var newHasChangesValue = false;
-        if (_lastChecksum != null && _lastChecksum != newCheckSum)
-        {
+        //if (_lastChecksum != null && _lastChecksum != newCheckSum)
+        //{
             // changed
             NotifyChanges();
 
             newHasChangesValue = true;
-        }
+        //}
 
         _hasChanged = newHasChangesValue;
 
