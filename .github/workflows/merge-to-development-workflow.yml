@@ -3,8 +3,52 @@ name: PR Development Workflow
 on:
   pull_request:
     branches:
+      - main
       - development
 
 jobs:
   call-run-unit-tests:
     uses: ./.github/workflows/run-unit-tests.yml
+
+  validate-yaml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate YAML file
+        run: yamllint ./.github/workflows/*.yml
+
+  CheckoutCode:
+    name: Checkout Code
+    uses: actions/checkout@v2
+
+  SetUpDockerBuild:
+    name: 🔧 Set up Docker Buildx
+    uses: docker/setup-buildx-action@v1
+
+#  LoginToDockerHub:
+#    name: 🔑 Login to DockerHub
+#    uses: docker/login-action@v1
+#    with:
+#      username: ${{ secrets.DOCKERHUB_USERNAME }}
+#      password: ${{ secrets.DOCKERHUB_USERNAME }}
+
+  BuildAndPushDockerImage:
+    name: Build and Push Docker Image
+    uses: docker/build-push-action@v2
+    with:
+      context: .
+      file: ./src/Dockerfile
+      push: true
+      tags: |
+        tommybeaton/kurrent:${{ inputs.environment }}
+        tommybeaton/kurrent:${{ inputs.environment }}-${{ inputs.version }}
+
+  BuildAndPushK8sImage:
+    name: 🏗️ Build and 📤 Push K8s Image 🛥️
+    uses: docker/build-push-action@v2
+    with:
+      context: .
+      file: ./src/Dockerfile
+      push: true
+      tags: tommybeaton/kurrent:${{ inputs.environment }}-k8s
+      build-args: ASPNETCORE_ENVIRONMENT=k8s
