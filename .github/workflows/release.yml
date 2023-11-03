@@ -28,9 +28,7 @@ jobs:
           
   build-and-push-docker-image:
     name: Build & Push Docker Image
-    needs: 
-      - call-run-unit-tests
-      - tag-and-release
+    needs: [ call-run-unit-tests, tag-and-release]
     runs-on: ubuntu-latest
     env:
       tag: ${{ needs.tag-and-release.outputs.new_tag }}
