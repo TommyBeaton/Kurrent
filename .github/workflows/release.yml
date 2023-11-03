@@ -11,12 +11,27 @@ jobs:
   call-run-unit-tests:
     uses: ./.github/workflows/run-unit-tests.yml
 
+  tag-and-release:
+    runs-on: ubuntu-latest
+    env:
+      prerelease: ${{ github.ref == 'refs/heads/main' && 'false' || 'true' }}
+    outputs:
+      new_tag: ${{ steps.tagging.outputs.new_tag }} 
+    steps:
+      - name: Bump version and push tag
+        id: tagging
+        uses: anothrNick/github-tag-action@1.34.0
+        with:
+          prerelease: ${{ env.prerelease }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PRERELEASE_SUFFIX: prerelease
+          
   build-and-push-docker-image:
     name: Build & Push Docker Image
     needs: call-run-unit-tests
     runs-on: ubuntu-latest
     env:
-      environment: ${{ github.ref == 'refs/heads/main' && 'latest' || 'preview' }}
+      tag: ${{ needs.tag-and-release.outputs.new_tag }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -37,7 +52,7 @@ jobs:
           file: ./src/Dockerfile
           push: true
           tags: |
-            tommybeaton/kurrent:${{ env.environment }}-v0.0.${{ github.run_number }}
+            tommybeaton/kurrent:${{ env.tag }}
 
       - name: 🏗️ Build and 📤 Push K8s Image 🛥️
         uses: docker/build-push-action@v2
@@ -46,7 +61,7 @@ jobs:
           file: ./src/Dockerfile
           push: true
           tags: |
-            tommybeaton/kurrent:${{ env.environment }}-k8s-v0.0.${{ github.run_number }}
+            tommybeaton/kurrent:k8s-${{ env.tag }}
           build-args: ASPNETCORE_ENVIRONMENT=k8s
 
   release-kustomization:
@@ -54,7 +69,7 @@ jobs:
     needs: build-and-push-docker-image
     runs-on: ubuntu-latest
     env:
-      environment: ${{ github.ref == 'refs/heads/main' && 'latest' || 'preview' }}
+      tag: ${{ needs.tag-and-release.outputs.new_tag }}
       prerelease: ${{ github.ref == 'refs/heads/main' && 'false' || 'true' }}
     steps:
       - name: Checkout code
@@ -62,26 +77,18 @@ jobs:
 
       - name: Prepare Kustomize File
         run: |
-          sed -i "s|image: tommybeaton/kurrent:.*|image: tommybeaton/kurrent:${{ env.environment }}-k8s-v0.0.${{ github.run_number }}|" ./kustomize/base/deployment.yaml
+          sed -i "s|image: tommybeaton/kurrent:.*|image: tommybeaton/kurrent:$k8s-${{ env.tag }}|" ./kustomize/base/deployment.yaml
 
       - name: Build Manifest
         run: kustomize build kustomize/base > release-kurrent.yaml
-
-      - name: Bump version and push tag
-        id: tagging
-        uses: anothrNick/github-tag-action@1.34.0
-        with:
-          prerelease: ${{ env.prerelease }
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PRERELEASE_SUFFIX: prerelease
 
       - name: Create Release
         if: steps.tagging.outputs.new_tag != ''
         uses: softprops/action-gh-release@v1
         with:
           draft: false
-          prerelease: ${{ env.prerelease }
+          prerelease: ${{ env.prerelease }}
           files: release-kurrent.yaml
-          tag_name: ${{ steps.tagging.outputs.new_tag }}
-          name: Release '${{ steps.tagging.outputs.new_tag }}'
+          tag_name: ${{ env.tag }}
+          name: Release '${{ env.tag }}'
       
