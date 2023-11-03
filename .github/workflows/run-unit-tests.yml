@@ -5,7 +5,7 @@ on:
   
 jobs:
   build-and-push:
-    name: Build & Push Docker Image
+    name: Build & Run Project
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
