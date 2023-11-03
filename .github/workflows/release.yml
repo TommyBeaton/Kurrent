@@ -71,7 +71,7 @@ jobs:
         id: tagging
         uses: anothrNick/github-tag-action@1.34.0
         with:
-          prerelease: ${{ env.prerelease }
+          prerelease: ${{ env.prerelease }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PRERELEASE_SUFFIX: prerelease
 
@@ -80,7 +80,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           draft: false
-          prerelease: ${{ env.prerelease }
+          prerelease: ${{ env.prerelease }}
           files: release-kurrent.yaml
           tag_name: ${{ steps.tagging.outputs.new_tag }}
           name: Release '${{ steps.tagging.outputs.new_tag }}'
