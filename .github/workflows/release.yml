@@ -20,14 +20,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        
-#      - name: Bump version and push tag
-#        id: tagging
-#        uses: anothrNick/github-tag-action@1.34.0
-#        env:
-#          prerelease: ${{ env.prerelease }}
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          PRERELEASE_SUFFIX: prerelease
 
       - name: Bump version and push tag
         id: tag_version
