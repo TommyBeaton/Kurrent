@@ -27,6 +27,8 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           pre_release_branches: development
+          release_branches: main
+          append_to_pre_release_tag: '' # stop appending branch name to pre-release tag
           
       - name: Env Debug
         run: |
@@ -94,7 +96,7 @@ jobs:
         run: kustomize build kustomize/base > release-kurrent.yaml
 
       - name: Create Release
-        if: steps.tagging.outputs.new_tag != ''
+        if: ${{ env.tag }} != ''
         uses: softprops/action-gh-release@v1
         with:
           draft: false
