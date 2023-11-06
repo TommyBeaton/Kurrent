@@ -79,7 +79,7 @@ jobs:
 
   release-kustomization:
     name: Release Kustomization
-    needs: build-and-push-docker-image
+    needs: [ build-and-push-docker-image, tag-and-release]
     runs-on: ubuntu-latest
     env:
       tag: ${{ needs.tag-and-release.outputs.new_tag }}
