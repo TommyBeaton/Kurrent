@@ -1,4 +1,4 @@
-name: Release Development Workflow
+name: Release Workflow
 
 on:
   pull_request_target:
@@ -11,15 +11,43 @@ jobs:
   call-run-unit-tests:
     uses: ./.github/workflows/run-unit-tests.yml
 
-  build-and-push-docker-image:
-    name: Build & Push Docker Image
-    needs: call-run-unit-tests
+  tag-and-release:
     runs-on: ubuntu-latest
     env:
-      environment: ${{ github.ref == 'refs/heads/main' && 'latest' || 'preview' }}
+      prerelease: ${{ github.ref == 'refs/heads/main' && 'false' || 'true' }}
+    outputs:
+      new_tag: ${{ steps.tag_version.outputs.new_tag }} 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pre_release_branches: development
+          release_branches: main
+          append_to_pre_release_tag: '' # stop appending branch name to pre-release tag
+          
+      - name: Env Debug
+        run: |
+          echo "New Tag: ${{ steps.tag_version.outputs.new_tag }}"
+          echo "Prerelease: ${{ env.prerelease }}"
+          
+  build-and-push-docker-image:
+    name: Build & Push Docker Image
+    needs: [ call-run-unit-tests, tag-and-release]
+    runs-on: ubuntu-latest
+    env:
+      tag: ${{ needs.tag-and-release.outputs.new_tag }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Env Debug
+        run: |
+          echo "New Tag: ${{ env.tag }}"
 
       - name: 🔧 Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -37,7 +65,7 @@ jobs:
           file: ./src/Dockerfile
           push: true
           tags: |
-            tommybeaton/kurrent:${{ env.environment }}-v0.0.${{ github.run_number }}
+            tommybeaton/kurrent:${{ env.tag }}
 
       - name: 🏗️ Build and 📤 Push K8s Image 🛥️
         uses: docker/build-push-action@v2
@@ -46,32 +74,34 @@ jobs:
           file: ./src/Dockerfile
           push: true
           tags: |
-            tommybeaton/kurrent:${{ env.environment }}-k8s-v0.0.${{ github.run_number }}
+            tommybeaton/kurrent:k8s-${{ env.tag }}
           build-args: ASPNETCORE_ENVIRONMENT=k8s
 
   release-kustomization:
     name: Release Kustomization
-    needs: build-and-push-docker-image
+    needs: [ build-and-push-docker-image, tag-and-release]
     runs-on: ubuntu-latest
     env:
-      environment: ${{ github.ref == 'refs/heads/main' && 'latest' || 'preview' }}
+      tag: ${{ needs.tag-and-release.outputs.new_tag }}
+      prerelease: ${{ github.ref == 'refs/heads/main' && 'false' || 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Prepare Kustomize File
         run: |
-          sed -i "s|image: tommybeaton/kurrent:.*|image: tommybeaton/kurrent:${{ env.environment }}-k8s-v0.0.${{ github.run_number }}|" ./kustomize/base/deployment.yaml
+          sed -i "s|image: tommybeaton/kurrent:.*|image: tommybeaton/kurrent:$k8s-${{ env.tag }}|" ./kustomize/base/deployment.yaml
 
       - name: Build Manifest
         run: kustomize build kustomize/base > release-kurrent.yaml
 
       - name: Create Release
+        if: ${{ env.tag }} != ''
         uses: softprops/action-gh-release@v1
         with:
           draft: false
-          prerelease: false
+          prerelease: ${{ env.prerelease }}
           files: release-kurrent.yaml
-          tag_name: ${{ env.environment }}-k8s-v0.0.${{ github.run_number }}
-          name: Release '${{ env.environment }}-k8s-v0.0.${{ github.run_number }}'
+          tag_name: ${{ env.tag }}
+          name: Release '${{ env.tag }}'
       
