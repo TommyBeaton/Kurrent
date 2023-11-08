@@ -92,7 +92,7 @@ public abstract class BasePoller : IPoller
 
             _latestTags[image] = latestTag;
             var container = new Container(Config.Url, image, latestTag);
-            _subscriptionHandler.UpdateFromPoller(Config.EventName, container);
+            _subscriptionHandler.UpdateFromPollerAsync(Config.EventName, container);
         }
     }
 

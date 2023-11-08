@@ -4,6 +4,6 @@ namespace Kurrent.Interfaces;
 
 public interface ISubscriptionHandler
 {
-    public void UpdateFromWebhook(string eventName, string type, string requestBody);
-    public void UpdateFromPoller(string pollerName, Container container);
+    public Task UpdateFromWebhookAsync(string eventName, string type, string requestBody);
+    public Task UpdateFromPollerAsync(string pollerName, Container container);
 }

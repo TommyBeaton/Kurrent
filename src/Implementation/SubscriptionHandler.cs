@@ -28,7 +28,7 @@ public class SubscriptionHandler : ISubscriptionHandler
         kurrentConfig.OnChange(config => _kurrentConfig = config);
     }
     
-    public async void UpdateFromWebhook(string eventName, string type, string requestBody)
+    public async Task UpdateFromWebhookAsync(string eventName, string type, string requestBody)
     {
         _logger.LogDebug("Received webhook {webhookName} of type {type}", 
             eventName, 
@@ -38,14 +38,14 @@ public class SubscriptionHandler : ISubscriptionHandler
 
         if (!container.IsValid)
         {
-            _logger.LogInformation($"Container image not found in request body for webhook {eventName}. Cancelling update");
+            _logger.LogInformation("Container image not found in request body for webhook {eventName}. Cancelling update", eventName);
             return;
         }
         
         await UpdateSubscribers(eventName, container);
     }
 
-    public async void UpdateFromPoller(string pollerName, Container container)
+    public async Task UpdateFromPollerAsync(string pollerName, Container container)
     {
         _logger.LogDebug("Received update from poller: {poller} with container: {container}",
             pollerName, 
