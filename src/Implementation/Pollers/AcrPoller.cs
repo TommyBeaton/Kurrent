@@ -25,7 +25,7 @@ public class AcrPoller : BasePoller
         var b64AuthString = Convert.ToBase64String(Encoding.UTF8.GetBytes(authenticationString));
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", b64AuthString);
         client.BaseAddress = new Uri($"https://{Config!.Url}/acr/v1/");
-        return await client.GetAsync($"{image}/_tags");
+        return await client.GetAsync($"{image}/_tags?orderby=timedesc");
     }
 
     protected override string ExtractLatestTag(string jsonResponse)
