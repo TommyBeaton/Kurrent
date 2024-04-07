@@ -106,12 +106,11 @@ public class RequestHandlerTests
         var result = _sut.GetTagFromRequest(requestBody, webhookType);
 
         // Assert
-        using (new AssertionScope())
-        {
-            result.Should().NotBeNull();
-            result.IsValid.Should().BeFalse();
-            _loggerMock.VerifyLog(LogLevel.Error, $"Could not deserialize {webhookType} request.", Times.Once());
-        }
+        using var _ = new AssertionScope();
+        result.Should().NotBeNull();
+        result.IsValid.Should().BeFalse();
+        _loggerMock.VerifyLog(LogLevel.Error, $"Could not deserialize {webhookType} request.", Times.Once());
+        
     }
 
 }

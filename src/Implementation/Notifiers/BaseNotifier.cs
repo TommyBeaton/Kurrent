@@ -7,7 +7,9 @@ namespace Kurrent.Implementation.Notifiers;
 
 public abstract class BaseNotifier : INotifier
 {
-    public abstract Task<NotifierResult> NotifyAsync(Container container, RepositoryConfig repositoryConfig,
+    public abstract Task<NotifierResult> NotifyAsync(
+        Container container, 
+        RepositoryConfig repositoryConfig,
         NotifierConfig notifierConfig,
         string? commitSha);
 
