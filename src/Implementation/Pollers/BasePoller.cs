@@ -95,7 +95,7 @@ public abstract class BasePoller : IPoller
             _logger.LogInformation("Found new tag {tag} for {image}", latestTag, image);
             
             var container = new Container(Config.Url, image, latestTag);
-            _subscriptionHandler.UpdateFromPoller(Config.EventName, container);
+            _subscriptionHandler.UpdateFromPollerAsync(Config.EventName, container);
         }
     }
 

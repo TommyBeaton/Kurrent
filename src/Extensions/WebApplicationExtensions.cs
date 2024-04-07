@@ -32,7 +32,7 @@ public static class WebApplicationExtensions
                 logger.LogDebug("Received payload for webhook {WebhookName}: {Payload}", webhook.EventName, requestBody);
 
                 // Doesn't need to be awaited, there's no need to wait for the webhook to be processed
-                subscriptionHandler.UpdateFromWebhook(webhook.EventName, webhook.Type, requestBody);
+                subscriptionHandler.UpdateFromWebhookAsync(webhook.EventName, webhook.Type, requestBody);
             }); 
         }
     }

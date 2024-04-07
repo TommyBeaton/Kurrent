@@ -41,8 +41,8 @@ public class RequestHandler : IRequestHandler
 
     private Container GetTagFromDockerRequest(string requestBody)
     {
-        var dockerRequest = JsonSerializer.Deserialize<DockerHubEvent>(requestBody);
-        
+        DockerHubEvent? dockerRequest = TryParseResponse<DockerHubEvent>(requestBody);
+
         if (dockerRequest?.Repository == null || dockerRequest.PushData == null)
             return LogAndReturnFailure(KurrentStrings.Docker, requestBody);
 
@@ -51,12 +51,28 @@ public class RequestHandler : IRequestHandler
 
     private Container GetTagFromAcrRequest(string requestBody)
     {
-        var acrRequest = JsonSerializer.Deserialize<AcrEvent>(requestBody);
+        AcrEvent? acrRequest = TryParseResponse<AcrEvent>(requestBody);
 
         if (acrRequest?.Request == null || acrRequest.Target == null)
             return LogAndReturnFailure(KurrentStrings.Acr, requestBody);
         
         return new Container(acrRequest.Request.Host, acrRequest.Target.Repository, acrRequest.Target.Tag);
+    }
+
+    private T? TryParseResponse<T>(string requestBody)
+    {
+        T? response = default;
+        try
+        {
+            response = JsonSerializer.Deserialize<T>(requestBody);
+            return response;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, e.Message);
+        }
+
+        return response;
     }
     
     private Container LogAndReturnFailure(string type, string requestBody)
