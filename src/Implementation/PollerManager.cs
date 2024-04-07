@@ -27,7 +27,7 @@ public class PollerManager : IPollerManager
 
     private void Start()
     {
-        if (_kurrentConfig?.Pollers == null)
+        if (_kurrentConfig?.Pollers == null || !_kurrentConfig.Pollers.Any())
         {
             _logger.LogWarning("No pollers found. This could be expected behaviour if none are configured.");
             return;
@@ -40,7 +40,7 @@ public class PollerManager : IPollerManager
             var poller = _pollerFactory.Create(pollerConfig.Type);
             
             if(poller == null)
-                throw new Exception($"Poller not found for {pollerConfig.Type}");
+                throw new ArgumentOutOfRangeException(nameof(pollerConfig.Type), $"Poller not found for {pollerConfig.Type}");
             
             _logger.LogInformation("Starting poller {poller}", pollerConfig.EventName);
             var task = Task.Run(() => poller.Start(pollerConfig, _cts.Token));

@@ -22,7 +22,10 @@ public class SlackNotifier : BaseNotifier
         _logger = logger;
     }
 
-    public override async Task<NotifierResult> NotifyAsync(Container container, RepositoryConfig repositoryConfig, NotifierConfig notifierConfig,
+    public override async Task<NotifierResult> NotifyAsync(
+        Container container, 
+        RepositoryConfig repositoryConfig, 
+        NotifierConfig notifierConfig,
         string? commitSha)
     {
         using var client = _httpClientFactory.CreateClient();
@@ -50,8 +53,7 @@ public class SlackNotifier : BaseNotifier
                 IsSuccess = false
             };
         }
-
-        client.Dispose();
+        
         var stringResponse = await response.Content.ReadAsStringAsync();
         _logger.LogTrace("Slack response: {response}", stringResponse);
         
