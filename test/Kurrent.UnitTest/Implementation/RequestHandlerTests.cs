@@ -99,7 +99,7 @@ public class RequestHandlerTests
     public void GetTagFromDockerRequest_FailingParsing_LogsErrorAndReturnsInvalidContainer(string webhookType)
     {
         // Arrange
-        var jsonFilePath = "helpers/data/invalid.json";
+        var jsonFilePath = "Helpers/Data/invalid.json";
         var requestBody = File.ReadAllText(jsonFilePath);
 
         // Act

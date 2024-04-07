@@ -49,18 +49,6 @@ public class PollerManagerTests
         _loggerMock.VerifyLog(LogLevel.Information, "Starting pollers", Times.Once());
     }
 
-    // [Fact]
-    // public async Task StopAsync_Should_StopPollers()
-    // {
-    //     var sut = GetSut(null!);
-    //     
-    //     // Act
-    //     await sut.StopAsync();
-    //
-    //     // Assert
-    //     _loggerMock.VerifyLog(LogLevel.Information, "Stopping pollers", Times.Once());
-    // }
-
     [Fact]
     public async Task StartAsync_Should_LogWhenNoPollersExist()
     {
