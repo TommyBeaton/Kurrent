@@ -77,11 +77,21 @@ public class GitService : IGitService
         var commit = repo.Commit(commitMessage, signature, signature);
         var pushOptions = new PushOptions
         {
-            CredentialsProvider = GetCredentialsHandler(repositoryConfig)
+            CredentialsProvider = GetCredentialsHandler(repositoryConfig),
+            OnPushStatusError = error =>
+            {
+                _logger.LogError("Push error for reference {Reference}: {Message}", error.Reference, error.Message);
+            },
+            OnNegotiationCompletedBeforePush = stats =>
+            {
+                _logger.LogInformation("Push negotiation completed with {ObjectsToPush} objects to push.", stats);
+                return true;
+            }
         };
         
         _logger.LogInformation("Pushing changes to repository: {repository}", repositoryConfig.Name);
-        repo.Network.Push(repo.Branches[branchName], pushOptions);
+        var branch = repo.Branches[branchName];
+        repo.Network.Push(branch, pushOptions);
         return commit.Sha;
     }
 

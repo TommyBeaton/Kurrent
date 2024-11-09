@@ -52,6 +52,7 @@ public abstract class BasePoller : IPoller
         _timer.AutoReset = true;
         _timer.Enabled = true;
         _timer.Start();
+        CheckForUpdates(token);
     }
 
     public void Stop()
