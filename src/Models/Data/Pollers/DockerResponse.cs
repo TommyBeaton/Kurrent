@@ -26,7 +26,7 @@ public class Result
     public long Id { get; set; }
 
     [JsonPropertyName("images")]
-    public Image[] Images { get; set; }
+    public DockerImage[] Images { get; set; }
 
     [JsonPropertyName("last_updated")]
     public DateTimeOffset LastUpdated { get; set; }
@@ -68,7 +68,7 @@ public class Result
     public string Digest { get; set; }
 }
 
-public class Image
+public class DockerImage
 {
     [JsonPropertyName("architecture")]
     public string Architecture { get; set; }

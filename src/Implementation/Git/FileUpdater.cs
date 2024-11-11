@@ -52,7 +52,7 @@ public class FileUpdater : IFileUpdater
     
     private string TryUpdate(string content, Image image)
     {
-        // If the container.Host is provided, make it mandatory in the regex pattern, otherwise make it optional.
+        // If the image.Host is provided, make it mandatory in the regex pattern, otherwise make it optional.
         string hostPattern = !string.IsNullOrEmpty(image.Host) ? image.Host + "\\/" : "(?<= )"; 
 
         var regex = new Regex($@"{hostPattern}{Regex.Escape(image.Repository)}:[^\s]+ # kurrent update; regex: (.*);");

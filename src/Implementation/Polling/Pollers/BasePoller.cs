@@ -64,20 +64,20 @@ public abstract class BasePoller : IPoller
 
     private async Task CheckForUpdates(CancellationToken token)
     {
-        foreach (var image in Config.Images)
+        foreach (var imageName in Config.Images)
         {
             if(token.IsCancellationRequested) //Check if we should stop
                 Stop();
             
-            _logger.LogInformation("Checking for {image} updates", image);
-            if(!_latestTags.TryGetValue(image, out string latestKnownTag))
+            _logger.LogInformation("Checking for {image} updates", imageName);
+            if(!_latestTags.TryGetValue(imageName, out string latestKnownTag))
             {
                 latestKnownTag = String.Empty;
-                _latestTags.Add(image, latestKnownTag);
+                _latestTags.Add(imageName, latestKnownTag);
             }
         
             using var client = _httpClientFactory.CreateClient();
-            using var httpResponse = await MakeHttpRequest(client, image);
+            using var httpResponse = await MakeHttpRequest(client, imageName);
 
             if (httpResponse == null)
                 continue;
@@ -89,12 +89,12 @@ public abstract class BasePoller : IPoller
             if(string.IsNullOrEmpty(latestTag) || latestKnownTag == latestTag)
                 continue;
 
-            _latestTags[image] = latestTag;
+            _latestTags[imageName] = latestTag;
 
-            _logger.LogInformation("Found new tag {tag} for {image}", latestTag, image);
+            _logger.LogInformation("Found new tag {tag} for {image}", latestTag, imageName);
             
-            var container = new Image(Config.Url, image, latestTag);
-            await _subscriptionHandler.UpdateAsync(Config.EventName, container);
+            var image = new Image(Config.Url, imageName, latestTag);
+            await _subscriptionHandler.UpdateAsync(Config.EventName, image);
         }
     }
 

@@ -16,7 +16,7 @@ public abstract class BaseNotifier : INotifier
     protected string GetPlainMessage(Image image, RepositoryConfig repositoryConfig, string? commitSha)
     {
         string text =
-            $"Kurrent update: New image {image.Name} was updated in {repositoryConfig.Name} {KurrentStrings.GetEmoji()}";
+            $"Kurrent update: New image {image.Name} was updated in {repositoryConfig.Name} {KurrentStrings.GetRandomEmoji()}";
         
         text += string.IsNullOrEmpty(commitSha) ? 
             "" : $"\n Commit sha: {commitSha}";

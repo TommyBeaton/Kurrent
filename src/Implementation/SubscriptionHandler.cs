@@ -34,7 +34,7 @@ public class SubscriptionHandler : ISubscriptionHandler
 
         if (repoConfigs == null || !repoConfigs.Any())
         {
-            _logger.LogWarning($"No subscriber found for event {eventName}. Cancelling update.");
+            _logger.LogWarning($"No repo config found for event {eventName}. Cancelling update.");
             return;
         }
 

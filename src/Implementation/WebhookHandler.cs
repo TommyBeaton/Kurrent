@@ -19,21 +19,26 @@ public class WebhookHandler : IWebhookHandler
         _logger = logger;
     }
     
-    public async Task ProcessWebhook(HttpContext context, WebhookConfig webhook)
+    public async Task ProcessRequestAsync(HttpContext context, WebhookConfig webhook)
     {
         using var reader = new StreamReader(context.Request.Body);
         var requestBody = await reader.ReadToEndAsync();
 
         _logger.LogDebug("Received payload for webhook {WebhookName}: {Payload}", webhook.EventName, requestBody);
 
-        var container = GetTagFromRequest(requestBody, webhook.Type);
+        var image = GetTagFromRequest(requestBody, webhook.Type);
+
+        if (image is null)
+        {
+            return;
+        }
         
-        await _subscriptionHandler.UpdateAsync(webhook.EventName, container);
+        await _subscriptionHandler.UpdateAsync(webhook.EventName, image);
     }
     
-    private Image GetTagFromRequest(string requestBody, string webhookType)
+    private Image? GetTagFromRequest(string requestBody, string webhookType)
     {
-        Image image;
+        Image? image;
         switch (webhookType.ToLower())
         {
             case KurrentStrings.Acr:
@@ -44,33 +49,41 @@ public class WebhookHandler : IWebhookHandler
                 break;
             default:
                 _logger.LogError($"Webhook type {webhookType} not supported");
-                return new Image();
+                return null;
+        }
+
+        if (image is null || !image.IsValid)
+        {
+            return null;
         }
         
-        if (!image.IsValid)
-            return image;
-
-        _logger.LogInformation($"Container image: {image} found in request body");
+        _logger.LogInformation($"Image: {image} found in request body");
         
         return image;
     }
 
-    private Image GetTagFromDockerRequest(string requestBody)
+    private Image? GetTagFromDockerRequest(string requestBody)
     {
         DockerHubEvent? dockerRequest = TryParseResponse<DockerHubEvent>(requestBody);
 
         if (dockerRequest?.Repository == null || dockerRequest.PushData == null)
-            return LogAndReturnFailure(KurrentStrings.Docker, requestBody);
+        {
+            LogFailure(KurrentStrings.Docker, requestBody);
+            return null;
+        }
 
         return new Image(Repository: dockerRequest.Repository.Name, Tag: dockerRequest.PushData.Tag);
     }
 
-    private Image GetTagFromAcrRequest(string requestBody)
+    private Image? GetTagFromAcrRequest(string requestBody)
     {
         AcrEvent? acrRequest = TryParseResponse<AcrEvent>(requestBody);
 
         if (acrRequest?.Request == null || acrRequest.Target == null)
-            return LogAndReturnFailure(KurrentStrings.Acr, requestBody);
+        {
+            LogFailure(KurrentStrings.Acr, requestBody);
+            return null;
+        }
         
         return new Image(acrRequest.Request.Host, acrRequest.Target.Repository, acrRequest.Target.Tag);
     }
@@ -91,9 +104,8 @@ public class WebhookHandler : IWebhookHandler
         return response;
     }
     
-    private Image LogAndReturnFailure(string type, string requestBody)
+    private void LogFailure(string type, string requestBody)
     {
         _logger.LogError($"Could not deserialize {type} request. Request body: {requestBody}");
-        throw new JsonException($"Could not deserialize {type} request. Request body: {requestBody}");
     }
 }

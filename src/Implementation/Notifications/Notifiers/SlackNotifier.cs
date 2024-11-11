@@ -69,7 +69,7 @@ public class SlackNotifier : BaseNotifier
             };
         }
         
-        _logger.LogInformation("Slack notification sent for container {container} in repository {repository}", 
+        _logger.LogInformation("Slack notification sent for image {image} in repository {repository}", 
             image.Name, 
             repositoryConfig.Name);
 

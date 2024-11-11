@@ -20,7 +20,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-app.AddDynamicWebHooks();
+app.AddWebhooks();
 
 app.MapGet("/status", () => StatusCodes.Status200OK);
 

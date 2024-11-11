@@ -2,7 +2,6 @@ using Kurrent.Interfaces.Git;
 using Kurrent.Models.Data;
 using Kurrent.Utils;
 using LibGit2Sharp;
-using Microsoft.Extensions.Options;
 
 namespace Kurrent.Implementation.Git;
 

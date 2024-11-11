@@ -84,12 +84,12 @@ public static class WebAppBuilderExtensions
         });
     }
     
-    public static void AddDynamicWebHooks(this WebApplication app)
+    public static void AddWebhooks(this WebApplication app)
     {
         var kurrentConfig = app.Services.GetRequiredService<IOptions<AppConfig>>().Value;
         
         var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
-        var logger = loggerFactory.CreateLogger("WebApplicationExtensions");
+        var logger = loggerFactory.CreateLogger(nameof(WebAppBuilderExtensions));
         
         if ((kurrentConfig?.Webhooks == null || !kurrentConfig.Webhooks.Any()) && 
             (kurrentConfig?.Pollers == null || !kurrentConfig.Pollers.Any()))
@@ -106,7 +106,7 @@ public static class WebAppBuilderExtensions
                 HttpContext context, 
                 IWebhookHandler webhookHandler) =>
             {
-                await webhookHandler.ProcessWebhook(context, webhook);
+                await webhookHandler.ProcessRequestAsync(context, webhook);
             }); 
         }
     }

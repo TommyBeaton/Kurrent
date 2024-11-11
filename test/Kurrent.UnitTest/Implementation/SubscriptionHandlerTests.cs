@@ -13,7 +13,6 @@ namespace Kurrent.UnitTest.Implementation;
 
 public class SubscriptionHandlerTests
 {
-    private readonly Mock<IWebhookHandler> _requestHandlerMock;
     private readonly Mock<IRepositoryUpdater> _repositoryUpdaterMock;
     private readonly Mock<INotificationHandler> _notificationHandlerMock;
     private readonly Mock<IOptionsMonitor<AppConfig>> _kurrentConfigMock;
@@ -31,12 +30,12 @@ public class SubscriptionHandlerTests
     
     private readonly AppConfig _config = new()
     {
-        Subscriptions = new List<SubscriptionConfig>
+        Repositories = new List<RepositoryConfig>
         {
             new()
             {
-                RepositoryName = RepoName,
-                EventName = EventName,
+                Name = RepoName,
+                EventSubscriptions = new List<string>{EventName},
                 Branch = BranchName
             }
         }
@@ -44,141 +43,95 @@ public class SubscriptionHandlerTests
 
     public SubscriptionHandlerTests()
     {
-        _requestHandlerMock = new();
         _repositoryUpdaterMock = new();
         _notificationHandlerMock = new();
         _kurrentConfigMock = new();
         _loggerMock = new();
     }
-    
-    [Fact]
-    public async Task UpdateFromWebhook_ValidRequest_UpdatesSubscribers()
+
+    private SubscriptionHandler CreateSut(RepositoryConfig? config = null)
     {
-        // Arrange
-        var sut = GetSut();
-        
-        // Act
-        await sut.UpdateFromWebhookAsync(EventName, "some type", "some body");
+        config ??= _config.Repositories[0];
 
-        // Assert
-        _repositoryUpdaterMock.Verify(m => m.UpdateAsync(It.IsAny<string>(), _image, It.IsAny<string>()), Times.AtLeastOnce);
-        _notificationHandlerMock.Verify(m => m.Send(It.IsAny<Image>(), It.IsAny<SubscriptionConfig>(), It.IsAny<string>()), Times.AtLeastOnce);
-    }
-    
-    [Fact]
-    public async Task UpdateFromWebhook_ReturnsOnInvalidContainer()
-    {
-        // Arrange
-        string expectedLog = $"Container image not found in request body for webhook {EventName}. Cancelling update";
-        
-        var mockContainer = new Image();
-        
-        
-
-        var sut = GetSut(container: mockContainer);
-
-        // Act
-        await sut.UpdateFromWebhookAsync(EventName, "some type", "some body");
-
-        // Assert
-        _loggerMock.VerifyLog(LogLevel.Information, expectedLog, Times.Once());
-        _repositoryUpdaterMock.Verify(m => m.UpdateAsync(It.IsAny<string>(), mockContainer, It.IsAny<string>()), Times.Never);
-        _notificationHandlerMock.Verify(m => m.Send(It.IsAny<Image>(), It.IsAny<SubscriptionConfig>(), It.IsAny<string>()), Times.Never);
-    }
-    
-    [Fact]
-    public async Task UpdateFromWebhook_ReturnsOnNoSubscribers()
-    {
-        // Arrange
-        string eventName = EventName + " not found";
-        string expectedLog = $"No subscriber found for event {EventName}. Cancelling update.";
-
-        var config = new AppConfig
+        var appConfig = new AppConfig
         {
-            Subscriptions = new List<SubscriptionConfig>
-            {
-                new()
-                {
-                    RepositoryName = RepoName,
-                    EventName = eventName,
-                    Branch = BranchName
-                }
-            }
+            Repositories = new List<RepositoryConfig> { config }
         };
-
-        var sut = GetSut(config);
-
-        // Act
-        await sut.UpdateFromWebhookAsync(EventName, "some type", "some body");
-
-        // Assert
-        _loggerMock.VerifyLog(LogLevel.Warning, expectedLog, Times.Once());
-        _repositoryUpdaterMock.Verify(m => m.UpdateAsync(It.IsAny<string>(), _image, It.IsAny<string>()), Times.Never);
-        _notificationHandlerMock.Verify(m => m.Send(It.IsAny<Image>(), It.IsAny<SubscriptionConfig>(), It.IsAny<string>()), Times.Never);
-    }
-    
-    [Fact]
-    public async Task UpdateFromPoller_ReturnsOnNoSubscribers()
-    {
-        // Arrange
-        string eventName = EventName + " not found";
-        string expectedLog = $"No subscriber found for event {EventName}. Cancelling update.";
-
-        var config = new AppConfig
-        {
-            Subscriptions = new List<SubscriptionConfig>
-            {
-                new()
-                {
-                    RepositoryName = RepoName,
-                    EventName = eventName,
-                    Branch = BranchName
-                }
-            }
-        };
-
-        var sut = GetSut(config);
-
-        // Act
-        await sut.UpdateFromPollerAsync(EventName, _image);
-
-        // Assert
-        _loggerMock.VerifyLog(LogLevel.Warning, expectedLog, Times.Once());
-        _repositoryUpdaterMock.Verify(m => m.UpdateAsync(It.IsAny<string>(), _image, It.IsAny<string>()), Times.Never);
-        _notificationHandlerMock.Verify(m => m.Send(It.IsAny<Image>(), It.IsAny<SubscriptionConfig>(), It.IsAny<string>()), Times.Never);
-    }
-    
-    [Fact]
-    public async Task UpdateFromPoller_ValidRequest_UpdatesSubscribers()
-    {
-        // Arrange
-        var sut = GetSut();
         
-        // Act
-        await sut.UpdateFromPollerAsync(EventName, _image);
-
-        // Assert
-        _repositoryUpdaterMock.Verify(m => m.UpdateAsync(It.IsAny<string>(), _image, It.IsAny<string>()), Times.AtLeastOnce);
-        _notificationHandlerMock.Verify(m => m.Send(It.IsAny<Image>(), It.IsAny<SubscriptionConfig>(), It.IsAny<string>()), Times.AtLeastOnce);
-    }
-
-    private SubscriptionHandler GetSut(AppConfig? kurrentConfig = null, Image? container = null, bool didUpdate = true, string commitSha = "some-sha")
-    {
-        var config = kurrentConfig ?? _config;
-        _kurrentConfigMock.Setup(x => x.CurrentValue).Returns(config);
-
-        var mockContainer = container ?? _image;
-        _requestHandlerMock.Setup(m => m.GetTagFromRequest(It.IsAny<string>(), It.IsAny<string>()))
-            .Returns(mockContainer);
-        _repositoryUpdaterMock.Setup(x => x.UpdateAsync(It.IsAny<string>(), It.IsAny<Image>(), It.IsAny<string>()))
-            .ReturnsAsync((didUpdate, commitSha));
+        _kurrentConfigMock.Setup(x => x.CurrentValue).Returns(appConfig);
         
         return new SubscriptionHandler(
-            _requestHandlerMock.Object,
             _repositoryUpdaterMock.Object,
             _kurrentConfigMock.Object,
             _notificationHandlerMock.Object,
             _loggerMock.Object
         );
+    }
+    
+    [Fact]
+    public async Task UpdateAsync_ReturnsOnNoSubscribers()
+    {
+        // Arrange
+        string eventName = EventName + " not found";
+        string expectedLog = $"No repo config found for event {EventName}. Cancelling update.";
+        
+        var sut = CreateSut(new RepositoryConfig());
+        
+        // Act
+        await sut.UpdateAsync(EventName, new Image());
+
+        // Assert
+        _loggerMock.VerifyLog(LogLevel.Warning, expectedLog, Times.Once());
+        _repositoryUpdaterMock.VerifyNoOtherCalls();
+        _notificationHandlerMock.VerifyNoOtherCalls();
+    }
+    
+    [Fact]
+    public async Task UpdateAsync_UpdatesSubscribers()
+    {
+        // Arrange 
+        var sut = CreateSut();
+        _repositoryUpdaterMock.Setup(m => m.UpdateAsync(_config.Repositories.First(), _image))
+            .ReturnsAsync((true, null));
+        
+        // Act
+        await sut.UpdateAsync(EventName, _image);
+
+        // Assert
+        _repositoryUpdaterMock.Verify(m => m.UpdateAsync(_config.Repositories.First(), _image), Times.Once);
+        _notificationHandlerMock.Verify(m => m.Send(_image, _config.Repositories.First(), EventName, null), Times.Once);
+    }
+    
+    [Fact]
+    public async Task UpdateAsync_DoesntSendNotification_When_DidntUpdateRepo()
+    {
+        // Arrange 
+        var sut = CreateSut();
+        _repositoryUpdaterMock.Setup(m => m.UpdateAsync(_config.Repositories.First(), _image))
+            .ReturnsAsync((false, null));
+        
+        // Act
+        await sut.UpdateAsync(EventName, _image);
+
+        // Assert
+        _repositoryUpdaterMock.Verify(m => m.UpdateAsync(_config.Repositories.First(), _image), Times.Once);
+        _notificationHandlerMock.VerifyNoOtherCalls();
+    }
+    
+    [Fact]
+    public async Task UpdateAsync_SendsCommitSha_WhenNotNull()
+    {
+        // Arrange
+        string commitSha = Guid.NewGuid().ToString();
+        var sut = CreateSut();
+        _repositoryUpdaterMock.Setup(m => m.UpdateAsync(_config.Repositories.First(), _image))
+            .ReturnsAsync((true, commitSha));
+        
+        // Act
+        await sut.UpdateAsync(EventName, _image);
+
+        // Assert
+        _repositoryUpdaterMock.Verify(m => m.UpdateAsync(_config.Repositories.First(), _image), Times.Once);
+        _notificationHandlerMock.Verify(m => m.Send(_image, _config.Repositories.First(), EventName, commitSha), Times.Once);
     }
 }

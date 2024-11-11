@@ -29,7 +29,7 @@ public class NotificationHandler : INotificationHandler
         
         if (notifierConfigs == null || !notifierConfigs.Any())
         {
-            _logger.LogWarning($"No Notifier configs not found for event: {eventName}");
+            _logger.LogWarning($"No Notifier configs found for event: {eventName}");
             return;
         }
 
