@@ -1,6 +1,8 @@
 ﻿using FluentAssertions;
 using Kurrent.Implementation;
+using Kurrent.Implementation.Polling;
 using Kurrent.Interfaces;
+using Kurrent.Interfaces.Polling;
 using Kurrent.UnitTest.Helpers.Extensions;
 using Kurrent.Utils;
 using Microsoft.Extensions.Logging;
@@ -11,20 +13,20 @@ namespace Kurrent.UnitTest.Implementation;
 
 public class PollerManagerTests
 {
-    private readonly Mock<IOptionsMonitor<KurrentConfig>> _configMock;
+    private readonly Mock<IOptionsMonitor<AppConfig>> _configMock;
     private readonly Mock<IPollerFactory> _pollerFactoryMock;
     private readonly Mock<ILogger<PollerManager>> _loggerMock;
     private readonly Mock<IPoller> _pollerMock;
 
     public PollerManagerTests()
     {
-        _configMock = new Mock<IOptionsMonitor<KurrentConfig>>();
+        _configMock = new Mock<IOptionsMonitor<AppConfig>>();
         _pollerFactoryMock = new Mock<IPollerFactory>();
         _loggerMock = new Mock<ILogger<PollerManager>>();
         _pollerMock = new Mock<IPoller>();
     }
 
-    private PollerManager GetSut(KurrentConfig config)
+    private PollerManager GetSut(AppConfig config)
     {
         _configMock.Setup(x => x.CurrentValue).Returns(config);
         return new PollerManager(_configMock.Object, _pollerFactoryMock.Object, _loggerMock.Object);
@@ -35,7 +37,7 @@ public class PollerManagerTests
     {
         // Arrange
         var pollers = new List<PollerConfig> { new PollerConfig { Type = "knownType" } };
-        var config = new KurrentConfig { Pollers = pollers };
+        var config = new AppConfig { Pollers = pollers };
 
         _pollerFactoryMock.Setup(x => x.Create(It.IsAny<string>())).Returns(_pollerMock.Object);
 
@@ -53,7 +55,7 @@ public class PollerManagerTests
     public async Task StartAsync_Should_LogWhenNoPollersExist()
     {
         // Arrange
-        var config = new KurrentConfig { Pollers = new List<PollerConfig>() };
+        var config = new AppConfig { Pollers = new List<PollerConfig>() };
         var sut = GetSut(config);
 
         // Act
@@ -68,7 +70,7 @@ public class PollerManagerTests
     {
         // Arrange
         var pollers = new List<PollerConfig> { new PollerConfig { Type = "UnknownType" } };
-        var config = new KurrentConfig { Pollers = pollers };
+        var config = new AppConfig { Pollers = pollers };
 
         _pollerFactoryMock.Setup(x => x.Create(It.IsAny<string>())).Returns((IPoller)null);
 
@@ -90,7 +92,7 @@ public class PollerManagerTests
             .Throws(new Exception("Test exception"));
 
         var pollers = new List<PollerConfig> { new PollerConfig { Type = "knownType" } };
-        var config = new KurrentConfig { Pollers = pollers };
+        var config = new AppConfig { Pollers = pollers };
         
         _pollerFactoryMock.Setup(x => x.Create(It.IsAny<string>())).Returns(_pollerMock.Object);
         var sut = GetSut(config);
@@ -110,7 +112,7 @@ public class PollerManagerTests
         // Arrange
         var fakePoller = new FakePoller();
         var pollers = new List<PollerConfig> { new PollerConfig { Type = "knownType" } };
-        var config = new KurrentConfig { Pollers = pollers };
+        var config = new AppConfig { Pollers = pollers };
 
         _pollerFactoryMock.Setup(x => x.Create(It.IsAny<string>())).Returns(fakePoller);
         var sut = GetSut(config);
@@ -130,7 +132,7 @@ public class PollerManagerTests
         // Arrange
         var fakePoller = new FakePoller();
         var pollers = new List<PollerConfig> { new PollerConfig { Type = "knownType" } };
-        var config = new KurrentConfig { Pollers = pollers };
+        var config = new AppConfig { Pollers = pollers };
 
         _pollerFactoryMock.Setup(x => x.Create(It.IsAny<string>())).Returns(fakePoller);
         var sut = GetSut(config);

@@ -1,5 +1,7 @@
 ﻿using Kurrent.Implementation;
+using Kurrent.Implementation.Notifications;
 using Kurrent.Interfaces;
+using Kurrent.Interfaces.Notifications;
 using Kurrent.Models.Data;
 using Kurrent.UnitTest.Helpers.Extensions;
 using Kurrent.Utils;
@@ -12,75 +14,65 @@ namespace Kurrent.UnitTest.Implementation;
 public class NotificationHandlerTests
 {
     private readonly Mock<INotifierFactory> _notifierFactoryMock = new();
-    private readonly Mock<IOptionsMonitor<KurrentConfig>> _configMock = new();
+    private readonly Mock<IOptionsMonitor<AppConfig>> _configMock = new();
     private readonly Mock<ILogger<NotificationHandler>> _loggerMock = new();
     private readonly Mock<INotifier> _notifierMock = new();
 
-    private NotificationHandler GetSut(KurrentConfig config)
+    private readonly string _eventName = "Event";
+    
+    private NotificationHandler GetSut(AppConfig config)
     {
         _configMock.Setup(x => x.CurrentValue).Returns(config);
-        return new NotificationHandler(_notifierFactoryMock.Object, _configMock.Object,
+        return new NotificationHandler(
+            _notifierFactoryMock.Object,
+            _configMock.Object,
             _loggerMock.Object);
-    }
-    
-    
-    [Fact]
-    public async Task Send_Should_LogError_When_RepositoryConfigIsNotFound()
-    {
-        // Arrange
-        var config = new KurrentConfig { Repositories = new List<RepositoryConfig>(0) };
-        var sut = GetSut(config);
-
-        var container = new Container { };
-        var subscription = new SubscriptionConfig { RepositoryName = "UnknownRepo" };
-
-        // Act
-        await sut.Send(container, subscription, null);
-
-        // Assert
-        _loggerMock.VerifyLog(LogLevel.Error, $"Repository config not found for {subscription.RepositoryName}", Times.Once());
     }
 
     [Fact]
     public async Task Send_Should_LogError_When_NotifierConfigIsNotFound()
     {
         // Arrange
-        var config = new KurrentConfig 
+        var config = new AppConfig 
         {
-            Repositories = new List<RepositoryConfig>
-            {
-                new RepositoryConfig { Name = "SomeRepo" }
-            },
-            Notifiers =new List<NotifierConfig>(0)
+            Notifiers =new List<NotifierConfig>()
         };
         var sut = GetSut(config);
 
-        var container = new Container { };
-        var subscription = new SubscriptionConfig { RepositoryName = "SomeRepo", EventName = "UnknownEvent" };
+        var image = new Image();
+        var repoConfig = new RepositoryConfig() { Name = "SomeRepo", EventSubscriptions = new List<string>{$"{_eventName}FooBar"} };
 
         // Act
-        await sut.Send(container, subscription, null);
+        await sut.Send(image, repoConfig, _eventName, null);
 
         // Assert
-        _loggerMock.VerifyLog(LogLevel.Error, $"Notifier config not found for {subscription.EventName}", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Warning, $"No Notifier configs found for event: {_eventName}", Times.Once());
     }
     
     [Fact]
-    public async Task Send_Should_LogError_When_NotifierIsNotFound()
+    public async Task Send_Should_LogError_When_NotifierTypeIsNotFound()
     {
         // Arrange
-        var notifiers = new List<NotifierConfig> { new NotifierConfig { Type = "knownType", EventName = "anyEvent"} };
-        var repositories = new List<RepositoryConfig> { new RepositoryConfig { Name = "knownRepo" } };
-        var config = new KurrentConfig { Notifiers = notifiers, Repositories = repositories };
+        var notifiers = new List<NotifierConfig>
+        {
+            new NotifierConfig
+            {
+                Type = "knownType", 
+                EventSubscriptions = new List<string>{_eventName}
+            }
+        };
+        var repositories = new List<RepositoryConfig> 
+            { new RepositoryConfig { Name = "knownRepo" } };
+        var config = new AppConfig { Notifiers = notifiers, Repositories = repositories };
         var sut = GetSut(config);
 
-        var container = new Container { };
-        var subscription = new SubscriptionConfig { RepositoryName = "knownRepo", EventName = "anyEvent" };
+        var image = new Image();
+        var repoConfig = new RepositoryConfig() { Name = "SomeRepo", EventSubscriptions = new List<string>{_eventName} };
 
         _notifierFactoryMock.Setup(x => x.Create(It.IsAny<string>())).Returns((INotifier)null);
 
         // Act
-        await sut.Send(container, subscription, null);
+        await sut.Send(image, repoConfig, _eventName, null);
 
         // Assert
         _loggerMock.VerifyLog(LogLevel.Error, $"Notifier not found for {notifiers[0].Type}", Times.Once());
@@ -90,20 +82,20 @@ public class NotificationHandlerTests
     public async Task Send_Should_CallNotifyAsync_When_AllValid()
     {
         // Arrange
-        var notifiers = new List<NotifierConfig>
-            { new NotifierConfig { Type = "knownType", EventName = "knownEvent" } };
-        var repositories = new List<RepositoryConfig> { new RepositoryConfig { Name = "knownRepo" } };
-        var config = new KurrentConfig { Notifiers = notifiers, Repositories = repositories };
+        var expectedNotifier = "testNotifier";
+        var expectedRepo = "testRepo";
+        var notifiers = new List<NotifierConfig> { new NotifierConfig { Name = expectedNotifier, Type = "knownType", EventSubscriptions = new List<string>{_eventName} } };
+        var config = new AppConfig { Notifiers = notifiers };
         var sut = GetSut(config);
 
-        var container = new Container { };
-        var subscription = new SubscriptionConfig { RepositoryName = "knownRepo", EventName = "knownEvent" };
+        var image = new Image();
+        var repoConfig = new RepositoryConfig() { Name = expectedRepo, EventSubscriptions = new List<string>{_eventName} };
         _notifierFactoryMock.Setup(x => x.Create(It.IsAny<string>())).Returns(_notifierMock.Object);
 
         // Act
-        await sut.Send(container, subscription, null);
+        await sut.Send(image, repoConfig, _eventName, null);
 
         // Assert
-        _notifierMock.Verify(x => x.NotifyAsync(container, repositories.First(), notifiers.First(), null), Times.Once);
+        _notifierMock.Verify(x => x.NotifyAsync(image, repoConfig, It.Is<NotifierConfig>(x => x.Name == expectedNotifier), null), Times.Once);
     }
 }
