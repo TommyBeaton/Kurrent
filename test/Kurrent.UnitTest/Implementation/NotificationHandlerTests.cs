@@ -1,5 +1,7 @@
 ﻿using Kurrent.Implementation;
+using Kurrent.Implementation.Notifications;
 using Kurrent.Interfaces;
+using Kurrent.Interfaces.Notifications;
 using Kurrent.Models.Data;
 using Kurrent.UnitTest.Helpers.Extensions;
 using Kurrent.Utils;
@@ -12,11 +14,11 @@ namespace Kurrent.UnitTest.Implementation;
 public class NotificationHandlerTests
 {
     private readonly Mock<INotifierFactory> _notifierFactoryMock = new();
-    private readonly Mock<IOptionsMonitor<KurrentConfig>> _configMock = new();
+    private readonly Mock<IOptionsMonitor<AppConfig>> _configMock = new();
     private readonly Mock<ILogger<NotificationHandler>> _loggerMock = new();
     private readonly Mock<INotifier> _notifierMock = new();
 
-    private NotificationHandler GetSut(KurrentConfig config)
+    private NotificationHandler GetSut(AppConfig config)
     {
         _configMock.Setup(x => x.CurrentValue).Returns(config);
         return new NotificationHandler(_notifierFactoryMock.Object, _configMock.Object,
@@ -28,10 +30,10 @@ public class NotificationHandlerTests
     public async Task Send_Should_LogError_When_RepositoryConfigIsNotFound()
     {
         // Arrange
-        var config = new KurrentConfig { Repositories = new List<RepositoryConfig>(0) };
+        var config = new AppConfig { Repositories = new List<RepositoryConfig>(0) };
         var sut = GetSut(config);
 
-        var container = new Container { };
+        var container = new Image { };
         var subscription = new SubscriptionConfig { RepositoryName = "UnknownRepo" };
 
         // Act
@@ -45,7 +47,7 @@ public class NotificationHandlerTests
     public async Task Send_Should_LogError_When_NotifierConfigIsNotFound()
     {
         // Arrange
-        var config = new KurrentConfig 
+        var config = new AppConfig 
         {
             Repositories = new List<RepositoryConfig>
             {
@@ -55,7 +57,7 @@ public class NotificationHandlerTests
         };
         var sut = GetSut(config);
 
-        var container = new Container { };
+        var container = new Image { };
         var subscription = new SubscriptionConfig { RepositoryName = "SomeRepo", EventName = "UnknownEvent" };
 
         // Act
@@ -71,10 +73,10 @@ public class NotificationHandlerTests
         // Arrange
         var notifiers = new List<NotifierConfig> { new NotifierConfig { Type = "knownType", EventName = "anyEvent"} };
         var repositories = new List<RepositoryConfig> { new RepositoryConfig { Name = "knownRepo" } };
-        var config = new KurrentConfig { Notifiers = notifiers, Repositories = repositories };
+        var config = new AppConfig { Notifiers = notifiers, Repositories = repositories };
         var sut = GetSut(config);
 
-        var container = new Container { };
+        var container = new Image { };
         var subscription = new SubscriptionConfig { RepositoryName = "knownRepo", EventName = "anyEvent" };
 
         _notifierFactoryMock.Setup(x => x.Create(It.IsAny<string>())).Returns((INotifier)null);
@@ -93,10 +95,10 @@ public class NotificationHandlerTests
         var notifiers = new List<NotifierConfig>
             { new NotifierConfig { Type = "knownType", EventName = "knownEvent" } };
         var repositories = new List<RepositoryConfig> { new RepositoryConfig { Name = "knownRepo" } };
-        var config = new KurrentConfig { Notifiers = notifiers, Repositories = repositories };
+        var config = new AppConfig { Notifiers = notifiers, Repositories = repositories };
         var sut = GetSut(config);
 
-        var container = new Container { };
+        var container = new Image { };
         var subscription = new SubscriptionConfig { RepositoryName = "knownRepo", EventName = "knownEvent" };
         _notifierFactoryMock.Setup(x => x.Create(It.IsAny<string>())).Returns(_notifierMock.Object);
 

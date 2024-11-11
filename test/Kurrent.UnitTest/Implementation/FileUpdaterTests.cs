@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Execution;
 using Kurrent.Implementation;
+using Kurrent.Implementation.Git;
 using Kurrent.Models.Data;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -31,7 +32,7 @@ public class FileUpdaterTests
 {entry(8)}
 noDomainImage: hello-world:development # kurrent update; regex: .*dev*.;
 pollingImage: owdev.azurecr.io/epc-api/api:1.0.29802-development-613f742 # kurrent update; regex: .*dev*.;";
-        var container = new Container
+        var container = new Image
         {
             Tag = tag(9),
             Host = host,
@@ -61,7 +62,7 @@ pollingImage: owdev.azurecr.io/epc-api/api:1.0.29802-development-613f742 # kurre
 {entry(8)}
 noDomainImage: hello-world:development # kurrent update; regex: .*dev*.;
 pollingImage: owdev.azurecr.io/epc-api/api:1.0.29802-development-613f742 # kurrent update; regex: .*dev*.;";
-        var container = new Container
+        var container = new Image
         {
             Tag = tag(9),
             Host = host,
@@ -86,7 +87,7 @@ pollingImage: owdev.azurecr.io/epc-api/api:1.0.29802-development-613f742 # kurre
 acrImage: myregistry.azurecr.io/hello-world:development-test-update8 # lighthouse update; regex: .*dev*.;
 noDomainImage: hello-world:development # lighthouse update; regex: .*dev*.;
 pollingImage: owdev.azurecr.io/epc-api/api:1.0.29802-development-613f742 # lighthouse update; regex: .*dev*.;";
-        var container = new Container
+        var container = new Image
         {
             Tag = "production-update1",
             Host = "myregistry.azurecr.io",
