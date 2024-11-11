@@ -37,44 +37,20 @@ data:
             "Type": "docker"
           }
         ],
-        "Subscriptions":[
-          {
-            "Name": "Example webhook subscription",
-            "EventName": "MainACR",
-            "RepositoryName": "Kurrent-Testing",
-            "Branch": "main"
-          },
-          {
-            "Name": "Example poll subscription ",
-            "EventName": "MainDockerHub",
-            "RepositoryName": "Kurrent-Testing",
-            "Branch": "main"
-          },
-          {
-            "Name": "Example poll subscription ",
-            "EventName": "AcrPoller",
-            "RepositoryName": "Kurrent-Testing",
-            "Branch": "main"
-          },
-          {
-            "Name": "Example poll subscription ",
-            "EventName": "DockerPoller",
-            "RepositoryName": "Kurrent-Testing",
-            "Branch": "main"
-          }
-        ],
         "Repositories": [
           {
             "Name": "Kurrent-Testing",
             "Url": "https://github.com/example/example",
             "Username": "not-used",
             "Password": "$(GithubToken)", 
-            "FileExtensions": [".yaml"]
+            "FileExtensions": [".yaml"],
+            "EventSubscriptions": ["MainACR", "MainDockerHub", "AcrPoller", "DockerPoller"],
+            "Branch": "main"
           }
         ],
         "Notifiers": [
           {
-            "EventName": "MainACR",
+            "EventSubscriptions": ["MainACR", "MainDockerHub", "AcrPoller", "DockerPoller"],
             "Name": "SlackNotifier",
             "Type": "slack",
             "Token": "$(SlackToken)",
@@ -83,4 +59,5 @@ data:
         ]
       }
     }
+    
     

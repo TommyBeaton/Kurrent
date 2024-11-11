@@ -5,7 +5,7 @@ namespace Kurrent.IntegrationTest.Utils;
 
 public static class TestUtils
 {
-    public static KurrentConfig GetConfiguration()
+    public static AppConfig GetConfiguration()
     {
         //load configuration from appsettings.json
         IConfiguration configuration = new ConfigurationBuilder()
@@ -14,6 +14,6 @@ public static class TestUtils
             .Build();
         
         //map configuration to TestConfiguration
-        return configuration.GetSection("Kurrent").Get<KurrentConfig>();
+        return configuration.GetSection("Kurrent").Get<AppConfig>();
     }
 }

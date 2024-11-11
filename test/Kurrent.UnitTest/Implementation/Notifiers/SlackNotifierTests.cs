@@ -2,7 +2,7 @@
 using System.Text.Json;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using Kurrent.Implementation.Notifiers;
+using Kurrent.Implementation.Notifications.Notifiers;
 using Kurrent.Models.Data;
 using Kurrent.Models.Data.Notifiers;
 using Kurrent.Utils;
@@ -35,7 +35,7 @@ public class SlackNotifierTests
     public async Task NotifyAsync_Successful_Response_Returns_Valid_NotifierResult()
     {
         // Arrange
-        var container = new Container("test-host", "test-repo", "test-tag");
+        var container = new Image("test-host", "test-repo", "test-tag");
         var repositoryConfig = new RepositoryConfig { Name = "test-repo", Url = "https://github.com/test-repo" };
         var notifierConfig = new NotifierConfig { Name = "slack", Token = "test-token", Channel = "test-channel" };
 
@@ -60,7 +60,7 @@ public class SlackNotifierTests
     public async Task NotifyAsync_Error_Response_Returns_Valid_NotifierResult()
     {
         // Arrange
-        var container = new Container("test-host", "test-repo", "test-tag");
+        var container = new Image("test-host", "test-repo", "test-tag");
         var repositoryConfig = new RepositoryConfig { Name = "test-repo", Url = "https://github.com/test-repo" };
         var notifierConfig = new NotifierConfig { Name = "slack", Token = "test-token", Channel = "test-channel" };
 
@@ -85,7 +85,7 @@ public class SlackNotifierTests
     public async Task NotifyAsync_Throws_Exception_Returns_Valid_NotifierResult()
     {
         // Arrange
-        var container = new Container("test-host", "test-repo", "test-tag");
+        var container = new Image("test-host", "test-repo", "test-tag");
         var repositoryConfig = new RepositoryConfig { Name = "test-repo", Url = "https://github.com/test-repo" };
         var notifierConfig = new NotifierConfig { Name = "slack", Token = "test-token", Channel = "test-channel" };
 
