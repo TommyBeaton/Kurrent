@@ -27,13 +27,14 @@ public class PollerManager : IPollerManager
 
     private void Start()
     {
+        // Set CTS here to avoid NREs down the line if no pollers are configured.
+        _cts = new CancellationTokenSource();
+        
         if (_appConfig?.Pollers == null || !_appConfig.Pollers.Any())
         {
             _logger.LogWarning("No pollers found. This could be expected behaviour if none are configured.");
             return;
         }
-
-        _cts = new CancellationTokenSource();
         
         foreach (var pollerConfig in _appConfig.Pollers)
         {

@@ -7,6 +7,7 @@ Kurrent auto-updates your Kubernetes manifests with the latest image tags from y
 - **Test Endpoints**: Add in test endpoints to test your configuration without having to push to your registry.
 - **Initial Config Validation**: Ensure Kurrent is configured correctly and can connect to your repositories successfully
 - **Pull Requests**: Have Kurrent push to a new branch in your repo and open a PR to the selected branch in config.
+- **Web UI**: Configure Kurrent through a web interface.
 ## 🚏 Getting Started with Kurrent
 
 ### How Kurrent Works
