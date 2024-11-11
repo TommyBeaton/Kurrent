@@ -5,7 +5,8 @@ Kurrent auto-updates your Kubernetes manifests with the latest image tags from y
 ## ⏰ Upcoming Features
 
 - **Test Endpoints**: Add in test endpoints to test your configuration without having to push to your registry.
-
+- **Initial Config Validation**: Ensure Kurrent is configured correctly and can connect to your repositories successfully
+- **Pull Requests**: Have Kurrent push to a new branch in your repo and open a PR to the selected branch in config.
 ## 🚏 Getting Started with Kurrent
 
 ### How Kurrent Works
@@ -33,16 +34,19 @@ Here is the `appsettings.k8s.json` configuration explained:
     - `Path`: Endpoint path.
     - `Type`: Registry sending the webhook.
 
-- **Subscriptions**: Determines how updates are processed.
-    - `Name`: Subscription name.
-    - `EventName`: Link to a Poller or Webhook.
-    - `RepositoryName` & `Branch`: Kubernetes manifest location.
-
 - **Repositories**: Storage details for Kubernetes manifests.
     - `Name`: Repository name.
     - `Url`: Git URL.
     - `Username` & `Password`: Repo access credentials.
     - `FileExtensions`: Target file types, e.g., `.yaml`.
+    - `EventSubscriptions`: Events that this repository should listen to (any event name that you have set above)
+    - `Branch`: The branch to write changes to
+- **Notifiers**: Storage details for Kubernetes manifests.
+    - `Name`: Notifier name.
+    - `Type`: Notifier type (`slack` for Slack). Slack is that is supported right now.
+    - `Token`: Token to make calls to your service
+    - `Channel`: Channel to send notifications to e.g. 'k8s-deployments'
+    - `EventSubscriptions`: Events that this notifier should listen to (any event name that you have set above)
 
 
 ### Annotations for Auto-Updates
