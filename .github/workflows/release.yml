@@ -29,6 +29,10 @@ jobs:
           pre_release_branches: development
           release_branches: main
           append_to_pre_release_tag: '' # stop appending branch name to pre-release tag
+          custom_release_rules: |
+            major:major,
+            minor:minor,
+            patch:patch
           
       - name: Env Debug
         run: |
